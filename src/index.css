@@ -96,13 +96,14 @@
 
   /* --- Hover Micro-Interactions --- */
   .motion-card-hover {
-    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
-                border-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   .motion-card-hover:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5), 0 0 15px -3px rgba(99, 102, 241, 0.15);
   }
 
   .motion-press {
@@ -227,40 +228,40 @@ html {
 
 @layer base {
   :root {
-    /* DEFAULT THEME: DARK MODE */
-    --color-bg-primary: #0f172a;
-    --color-bg-secondary: #111827;
-    --color-bg-panel: #1e293b;
-    --color-bg-card: #243244;
-    --color-text-primary: #f8fafc;
-    --color-text-secondary: #cbd5e1;
-    --color-text-muted: #94a3b8;
-    --color-accent: #2563eb;
-    --color-success: #16a34a;
-    --color-warning: #f59e0b;
-    --color-critical: #dc2626;
-    --color-info: #0891b2;
-    --color-border: #334155;
-    --color-focus: #d4af37; /* gold */
+    /* STADIUMOPS CHAMPIONSHIP PLATINUM VISUAL IDENTITY */
+    --color-bg-primary: #0a0b0d;      /* Rich Graphite Black Canvas */
+    --color-bg-secondary: #0f1115;    /* Deep Charcoal Slate Panels */
+    --color-bg-panel: #14171d;        /* Championship Card Slate background */
+    --color-bg-card: #1c2029;         /* Accentuated hover card background */
+    --color-text-primary: #f9fafb;     /* Pure Soft White text */
+    --color-text-secondary: #9ca3af;   /* Muted gray description text */
+    --color-text-muted: #6b7280;       /* Deep slate caption text */
+    --color-accent: #d4af37;           /* Championship Gold accent */
+    --color-success: #10b981;          /* Emerald Green tactical status */
+    --color-warning: #f59e0b;          /* Warning Amber Orange */
+    --color-critical: #ef4444;         /* Action Critical Red */
+    --color-info: #3b82f6;             /* System status blue */
+    --color-border: #22252e;           /* Rich Graphite dark outline */
+    --color-focus: #10b981;            /* Emerald Green focus ring indicator */
     --color-hover-brightness: 1.1;
   }
 
   /* LIGHT MODE THEME */
   :root.theme-light {
-    --color-bg-primary: #f8fafc;
-    --color-bg-secondary: #f1f5f9;
+    --color-bg-primary: #f9fafb;
+    --color-bg-secondary: #f3f4f6;
     --color-bg-panel: #ffffff;
-    --color-bg-card: #f8fafc;
-    --color-text-primary: #0f172a;
-    --color-text-secondary: #334155;
-    --color-text-muted: #64748b;
-    --color-accent: #1d4ed8;
-    --color-success: #15803d;
+    --color-bg-card: #f9fafb;
+    --color-text-primary: #111827;
+    --color-text-secondary: #4b5563;
+    --color-text-muted: #9ca3af;
+    --color-accent: #10b981;
+    --color-success: #10b981;
     --color-warning: #d97706;
     --color-critical: #b91c1c;
-    --color-info: #0e7490;
-    --color-border: #cbd5e1;
-    --color-focus: #0f172a;
+    --color-info: #2563eb;
+    --color-border: #e5e7eb;
+    --color-focus: #10b981;
     --color-hover-brightness: 0.9;
   }
 
@@ -272,14 +273,14 @@ html {
     --color-bg-card: #000000;
     --color-text-primary: #ffffff;
     --color-text-secondary: #ffffff;
-    --color-text-muted: #ffff00; /* High visible yellow */
-    --color-accent: #0000ff;
+    --color-text-muted: #d4af37;
+    --color-accent: #10b981;
     --color-success: #00ff00;
     --color-warning: #ffaa00;
     --color-critical: #ff0000;
     --color-info: #00ffff;
     --color-border: #ffffff;
-    --color-focus: #ffff00;
+    --color-focus: #d4af37;
     --color-hover-brightness: 1.2;
   }
 

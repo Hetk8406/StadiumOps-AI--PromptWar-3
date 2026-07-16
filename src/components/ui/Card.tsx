@@ -18,7 +18,7 @@ export function Card({ children, className = '', role, style }: CardProps): Reac
     <div
       role={role}
       style={style}
-      className={`bg-bg-panel border border-stadium-border rounded-md shadow-subtle p-4 motion-card-hover ${className}`}
+      className={`bg-bg-panel border border-white/[0.05] rounded-lg shadow-xl p-6 transition-all duration-200 motion-card-hover ${className}`}
     >
       {children}
     </div>
@@ -32,7 +32,7 @@ interface CardHeaderProps {
 
 export function CardHeader({ children, className = '' }: CardHeaderProps): React.JSX.Element {
   return (
-    <div className={`border-b border-stadium-border pb-3 mb-3 ${className}`}>
+    <div className={`border-b border-white/[0.05] pb-4 mb-4 ${className}`}>
       {children}
     </div>
   );

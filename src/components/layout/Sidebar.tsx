@@ -46,9 +46,21 @@ export default function Sidebar({
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-bg-panel text-text-primary select-none">
+      {/* Premium Desktop Sidebar Brand Header */}
+      <div className="flex items-center gap-3 px-6 py-4.5 border-b border-stadium-border/60">
+        <div className="w-7 h-7 bg-stadium-accent rounded flex items-center justify-center font-black text-white text-xs shadow-md shrink-0">
+          SO
+        </div>
+        {!isCollapsed && (
+          <span className="font-extrabold tracking-widest text-xs text-text-primary uppercase truncate">
+            STADIUMOPS AI
+          </span>
+        )}
+      </div>
+
       {/* Header for Mobile Drawer Mode only */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-stadium-border">
-        <span className="font-bold tracking-wider text-sm">STADIUOPS AI MENU</span>
+        <span className="font-bold tracking-wider text-sm text-stadium-accent">STADIUMOPS AI</span>
         <Button
           variant="outline"
           size="sm"

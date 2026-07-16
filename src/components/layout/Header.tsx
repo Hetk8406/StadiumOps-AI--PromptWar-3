@@ -1,99 +1,119 @@
-/**
- * Header Component
- * Global command center header with page title transition.
- */
-
 import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { Search, SunMoon } from 'lucide-react';
+import { useLocation, NavLink } from 'react-router-dom';
+import { Search, User, Settings } from 'lucide-react';
 import NotificationCenter from '../notifications/NotificationCenter';
-import { APP_CONFIG } from '../../config/constants';
-import { Button } from '../ui/Button';
+import { ROUTES } from '../../config/constants';
 
-interface HeaderProps {
-  onMenuToggle: () => void;
-}
-
-export default function Header({ onMenuToggle }: HeaderProps): React.JSX.Element {
+export default function Header(): React.JSX.Element {
   const location = useLocation();
 
-  const getPageTitle = () => {
-    const segment = location.pathname.split('/').filter(Boolean)[0];
-    if (!segment) return 'Home Overview';
-    const titles: Record<string, string> = {
-      incidents: 'Incident Analysis Room',
-      volunteers: 'Volunteer Dispatch Center',
-      crowd: 'Crowd Intelligence',
-      communications: 'Multilingual Comms Hub',
-      accessibility: 'Accessibility Assistance',
-      reports: 'Incident Logs & Reports',
-      settings: 'Console Settings',
-    };
-    return titles[segment] || 'Command Center';
-  };
+  const navItems = [
+    { name: 'Operations', path: ROUTES.DASHBOARD },
+    { name: 'Match Day', path: ROUTES.CROWD },
+    { name: 'Security', path: ROUTES.INCIDENTS },
+    { name: 'Logistics', path: ROUTES.VOLUNTEERS },
+    { name: 'Comms', path: ROUTES.COMMUNICATIONS },
+    { name: 'Accessibility', path: ROUTES.ACCESSIBILITY },
+    { name: 'Analytics', path: '/reports' },
+    { name: 'Settings', path: ROUTES.SETTINGS },
+  ];
 
   return (
-    <header className="bg-bg-secondary border-b border-stadium-border h-16 px-6 flex items-center justify-between z-30 select-none">
-      {/* Brand Logo & Mobile Toggle */}
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={onMenuToggle}
-          className="md:hidden p-2 text-text-secondary hover:text-text-primary rounded-md motion-focus-ring focus:outline-none focus:ring-2 focus:ring-stadium-accent transition-colors"
-          aria-label="Toggle navigation navigation menu"
+    <header className="bg-[#080a0f] border-b border-white/[0.04] h-24 pt-4 px-8 flex items-center justify-between z-30 select-none w-full shrink-0">
+      {/* Left side: Premium Shield Logo & Brand name */}
+      <div className="flex items-center space-x-3 shrink-0">
+        <svg
+          className="w-9 h-9"
+          viewBox="0 0 100 100"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
-        </button>
-
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-stadium-gold-600 rounded flex items-center justify-center font-black text-bg-primary text-sm shadow-subtle">
-            FWC
-          </div>
-          <span className="hidden sm:inline-block font-bold text-sm tracking-widest text-text-primary uppercase">
-            {APP_CONFIG.name.split('–')[0]}
-          </span>
+          {/* Gold Shield Outer */}
+          <path
+            d="M50 8L82 22V50C82 72 50 90 50 90C50 90 18 72 18 50V22L50 8Z"
+            stroke="#d4af37"
+            strokeWidth="5.5"
+            strokeLinejoin="round"
+            fill="none"
+          />
+          {/* Inner monogram arch */}
+          <path
+            d="M32 48C32 48 40 38 50 38C60 38 68 48 68 48"
+            stroke="#f3f4f6"
+            strokeWidth="5.5"
+            strokeLinecap="round"
+          />
+          {/* Vertical central pillar */}
+          <path
+            d="M50 38V68"
+            stroke="#d4af37"
+            strokeWidth="5.5"
+            strokeLinecap="round"
+          />
+          {/* Base structure support lines */}
+          <path
+            d="M35 56L50 71L65 56"
+            stroke="#d4af37"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <div className="flex flex-col">
+          <span className="font-sans font-black tracking-[0.2em] text-[10.5px] text-white leading-none">FIFA 2026</span>
+          <span className="font-sans font-light tracking-[0.3em] text-[8px] text-[#d4af37] leading-none mt-1">COMMAND</span>
         </div>
       </div>
 
-      {/* Header Search Box */}
-      <div className="hidden lg:flex items-center flex-1 max-w-md mx-8 relative">
-        <Search className="w-4 h-4 text-text-muted absolute left-3 pointer-events-none" />
-        <input
-          type="search"
-          placeholder="Global operational search (incidents, personnel, zones)..."
-          className="w-full bg-bg-primary text-text-primary text-xs pl-10 pr-4 py-2 border border-stadium-border rounded-md motion-form-focus focus:outline-none focus:ring-2 focus:ring-stadium-accent placeholder:text-text-muted"
-          aria-label="Global console search"
-        />
-      </div>
+      {/* Center Section: Navigation tabs */}
+      <nav className="flex items-center space-x-2" aria-label="Main Navigation">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={`relative px-4 py-2.5 rounded-lg text-[10px] font-bold tracking-[0.15em] transition-all duration-300 uppercase whitespace-nowrap ${
+                isActive
+                  ? 'text-white bg-white/[0.03] border border-white/[0.08]'
+                  : 'text-[#9ca3af] border border-transparent hover:text-white hover:bg-white/[0.02]'
+              }`}
+            >
+              {item.name}
+              {isActive && (
+                <span className="absolute bottom-[-13px] left-1/2 -translate-x-1/2 w-4 h-[3px] bg-[#d4af37] rounded-full shadow-[0_0_8px_#d4af37]" />
+              )}
+            </NavLink>
+          );
+        })}
+      </nav>
 
-      {/* Active Panel Title and Icons */}
-      <div className="flex items-center space-x-4">
-        <h2 className="hidden md:block text-sm font-semibold border-r border-stadium-border pr-4 mr-2 text-text-secondary">
-          {getPageTitle()}
-        </h2>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="p-2 border-none hover:bg-bg-panel text-text-secondary"
-          aria-label="Toggle high contrast accessibility theme mode"
+      {/* Right side: Search, Notification Badge & Profile/Settings icons */}
+      <div className="flex items-center space-x-4 shrink-0">
+        <button
+          className="p-2 text-[#9ca3af] hover:text-white hover:bg-white/[0.03] rounded-lg transition-all"
+          aria-label="Search Console"
         >
-          <SunMoon className="w-4 h-4" />
-        </Button>
+          <Search className="w-4 h-4" />
+        </button>
 
-        <div className="relative">
+        <div className="relative shrink-0 p-1 hover:bg-white/[0.03] rounded-lg transition-all">
           <NotificationCenter />
         </div>
 
-        <div className="flex items-center space-x-2 border-l border-stadium-border pl-4">
-          <div className="w-8 h-8 rounded-full bg-stadium-accent text-white flex items-center justify-center font-bold text-xs">
-            OP
-          </div>
-          <span className="hidden xl:block text-xs font-semibold text-text-secondary">
-            OPERATOR-26
-          </span>
-        </div>
+        <button
+          className="p-2 text-[#9ca3af] hover:text-white hover:bg-white/[0.03] rounded-lg transition-all"
+          aria-label="User profile panel"
+        >
+          <User className="w-4 h-4" />
+        </button>
+
+        <button
+          className="p-2 text-[#9ca3af] hover:text-white hover:bg-white/[0.03] rounded-lg transition-all"
+          aria-label="System Settings"
+        >
+          <Settings className="w-4 h-4" />
+        </button>
       </div>
     </header>
   );
