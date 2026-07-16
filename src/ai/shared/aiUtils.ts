@@ -27,6 +27,7 @@ export function generateRequestId(): string {
 export function sanitizeAIText(raw: string, maxLength = 2000): string {
   return raw
     .replace(/<[^>]*>/g, '')        // strip HTML tags
+    // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001F]/g, '') // strip control chars
     .trim()
     .slice(0, maxLength);

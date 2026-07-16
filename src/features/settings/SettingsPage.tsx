@@ -73,8 +73,8 @@ export default function SettingsPage(): React.JSX.Element {
               key={item.id}
               onClick={() => setActiveSection(item.id)}
               className={`flex items-center space-x-3 px-3 py-2.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors focus:outline-none focus:ring-1 focus:ring-stadium-accent ${activeSection === item.id
-                  ? 'bg-stadium-accent text-white font-bold'
-                  : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary'
+                ? 'bg-stadium-accent text-white font-bold'
+                : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary'
                 }`}
             >
               <item.icon className="w-4 h-4" />
@@ -250,7 +250,7 @@ export default function SettingsPage(): React.JSX.Element {
               </CardHeader>
               <div className="space-y-3 text-xs text-text-secondary">
                 <p className="leading-relaxed">
-                  Developed for the Hack2Skill × Google PromptWars Virtual Challenge 3. This command center coordinates telemetry lines for stadium security detail, multilingual translation channels, and crowd flow load-balancing units during the FIFA World Cup 2026.
+                  Developed for the Hack2Skill × Google PromptWars Virtual Challenge 4. This command center coordinates telemetry lines for stadium security detail, multilingual translation channels, and crowd flow load-balancing units during the FIFA World Cup 2026.
                 </p>
               </div>
             </Card>
