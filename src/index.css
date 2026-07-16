@@ -1,0 +1,338 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   ENTERPRISE MOTION SYSTEM — Custom Keyframes
+   ============================================================ */
+
+@keyframes motion-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes motion-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes motion-scale-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes motion-slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes motion-slide-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motion-slide-in-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motion-page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motion-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes motion-pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+@keyframes motion-stagger-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   ENTERPRISE MOTION SYSTEM — CSS Utility Classes
+   ============================================================ */
+
+@layer utilities {
+  /* --- Mount / Unmount Animations --- */
+  .motion-fade-in {
+    animation: motion-fade-in 200ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  .motion-fade-out {
+    animation: motion-fade-out 150ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  .motion-scale-in {
+    animation: motion-scale-in 200ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  .motion-slide-in-right {
+    animation: motion-slide-in-right 300ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  .motion-slide-in-up {
+    animation: motion-slide-in-up 250ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  .motion-slide-in-down {
+    animation: motion-slide-in-down 250ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  .motion-page-enter {
+    animation: motion-page-enter 200ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  .motion-stagger-in {
+    animation: motion-stagger-in 200ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  /* --- Hover Micro-Interactions --- */
+  .motion-card-hover {
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .motion-card-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+  }
+
+  .motion-press {
+    transition: transform 75ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .motion-press:active {
+    transform: scale(0.985);
+  }
+
+  /* --- Toast / Notification Animations --- */
+  .motion-toast-enter {
+    animation: motion-slide-in-up 300ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  /* --- Panel Transitions --- */
+  .motion-panel-slide {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1),
+                opacity 200ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  /* --- Table Row Hover --- */
+  .motion-table-row {
+    transition: background-color 100ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* --- Focus Ring Transition --- */
+  .motion-focus-ring {
+    transition: box-shadow 120ms cubic-bezier(0.4, 0, 0.2, 1),
+                outline-offset 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* --- Form Focus --- */
+  .motion-form-focus {
+    transition: border-color 120ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* --- Command Palette Search --- */
+  .motion-command-enter {
+    animation: motion-scale-in 200ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  /* --- Notification Center Slide --- */
+  .motion-notification-slide {
+    animation: motion-slide-in-right 300ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  /* --- Shimmer effect for loading --- */
+  .motion-shimmer {
+    background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.06) 50%, transparent 75%);
+    background-size: 200% 100%;
+    animation: motion-shimmer 1.5s infinite;
+  }
+
+  /* --- Staggered list item entrance --- */
+  .motion-stagger-item {
+    animation: motion-stagger-in 200ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  /* --- Skeleton pulse (refined) --- */
+  .motion-skeleton-pulse {
+    animation: motion-pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* ============================================================
+   BASE: Focus & Selection
+   ============================================================ */
+
+/* Accessibility settings support */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Smooth scroll for anchor navigation & customized enterprise scrollbars */
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ============================================================
+   BASE: Reduced Motion Support
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Allow body theme transition to remain for accessibility */
+  body {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   BASE: CSS Custom Properties — Dark Mode (Default)
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* DEFAULT THEME: DARK MODE */
+    --color-bg-primary: #0f172a;
+    --color-bg-secondary: #111827;
+    --color-bg-panel: #1e293b;
+    --color-bg-card: #243244;
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-accent: #2563eb;
+    --color-success: #16a34a;
+    --color-warning: #f59e0b;
+    --color-critical: #dc2626;
+    --color-info: #0891b2;
+    --color-border: #334155;
+    --color-focus: #d4af37; /* gold */
+    --color-hover-brightness: 1.1;
+  }
+
+  /* LIGHT MODE THEME */
+  :root.theme-light {
+    --color-bg-primary: #f8fafc;
+    --color-bg-secondary: #f1f5f9;
+    --color-bg-panel: #ffffff;
+    --color-bg-card: #f8fafc;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #334155;
+    --color-text-muted: #64748b;
+    --color-accent: #1d4ed8;
+    --color-success: #15803d;
+    --color-warning: #d97706;
+    --color-critical: #b91c1c;
+    --color-info: #0e7490;
+    --color-border: #cbd5e1;
+    --color-focus: #0f172a;
+    --color-hover-brightness: 0.9;
+  }
+
+  /* HIGH CONTRAST MODE THEME */
+  :root.theme-high-contrast {
+    --color-bg-primary: #000000;
+    --color-bg-secondary: #000000;
+    --color-bg-panel: #000000;
+    --color-bg-card: #000000;
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #ffffff;
+    --color-text-muted: #ffff00; /* High visible yellow */
+    --color-accent: #0000ff;
+    --color-success: #00ff00;
+    --color-warning: #ffaa00;
+    --color-critical: #ff0000;
+    --color-info: #00ffff;
+    --color-border: #ffffff;
+    --color-focus: #ffff00;
+    --color-hover-brightness: 1.2;
+  }
+
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+}
+
+/* ============================================================
+   UTILITIES: Typography & Spacing
+   ============================================================ */
+
+@layer utilities {
+  /* Typography Utility Classes */
+  .text-h1 {
+    font-size: 1.75rem; /* 28px */
+    font-weight: 700;
+    line-height: 2.25rem;
+    letter-spacing: -0.025em;
+  }
+  .text-h2 {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 600;
+    line-height: 2rem;
+    letter-spacing: -0.02em;
+  }
+  .text-h3 {
+    font-size: 1.25rem; /* 20px */
+    font-weight: 600;
+    line-height: 1.75rem;
+    letter-spacing: -0.015em;
+  }
+  .text-body {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 400;
+    line-height: 1.25rem;
+  }
+  .text-caption {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 500;
+    line-height: 1rem;
+    color: var(--color-text-muted);
+  }
+
+  /* Spacing Scale Utilities for margins / paddings */
+  .space-xs { gap: 4px; }
+  .space-sm { gap: 8px; }
+  .space-md { gap: 12px; }
+  .space-lg { gap: 16px; }
+  .space-xl { gap: 20px; }
+  .space-2xl { gap: 24px; }
+  .space-3xl { gap: 32px; }
+}
