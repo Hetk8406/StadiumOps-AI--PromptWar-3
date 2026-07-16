@@ -11,6 +11,31 @@ This application features a full visual redesign with a premium dark-themed layo
 
 ---
 
+## Challenge Submission Details
+
+### 1. Chosen Vertical
+* **Vertical**: **Smart Stadiums & Tournament Operations (StadiumOps AI - FIFA World Cup 2026)**.
+* **Goal**: Provide stadium commanders with real-time incident tracking, automated volunteer dispatch recommendation engine, crowd density load balancing, multilingual communications, and accessible lift routing.
+
+### 2. Approach & AI Logic
+* **Generative AI Integration**: Powered by the Google Generative AI SDK (Gemini models). Prompts are built dynamically by aggregating local UI states (e.g. incident severity, volunteer locations, crowd status).
+* **Schema Validation & Parsing**: To prevent AI output hallucination and structure breakage, all prompts request strict JSON structures. These are parsed locally and validated using strict TypeScript schemas.
+* **UI Design**: Engineered with a premium, low-fatigue dark layout with high contrast capabilities. Includes a keyboard-first navigation Command Palette (`Ctrl + K`) to execute macros without leaving the keyboard.
+
+### 3. How the Solution Works
+1. **Command Dashboard**: Displays real-time operational telemetry (incident rates, gate load indices, active dispatches).
+2. **AI Incident Monitor**: Analyzes incident logs and recommends immediate action checklists.
+3. **AI Volunteer Dispatch**: Matches and dispatches the closest, most suitable volunteers to open incidents.
+4. **AI Crowd Congestion Redirection**: Suggests physical routing strategies to balance gate flows.
+5. **AI Accessibility Dispatch**: Manages sensory and mobility assistance dispatches, routing spectators around blocked staircases using lift keys.
+6. **AI Translation Center**: Auto-adapts tone and translates announcements to spectator and security channels.
+
+### 4. Assumptions Made
+* **Offline & Keyless Resilience**: If no `VITE_GEMINI_API_KEY` is provided, the application automatically triggers local simulation adapters. This prevents application crashes and provides instant mock AI recommendations so the app is always interactive.
+* **Mock Telemetry Data**: The database state matches realistic stadium specs (Gates 01–24, Zones A–G, and volunteer roles).
+
+---
+
 ## Key Features
 
 *   **Operations Dashboard:** Real-time metrics tracking gates occupancy, incident response rates, and volunteer loads.
