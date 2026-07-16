@@ -17,6 +17,7 @@ import { Button } from '../../components/ui/Button';
 import { useCommunications, useTranslationAI } from '../../state';
 import { BroadcastPriority } from '../../domain/enums';
 import { Broadcast } from '../../domain/models';
+import { pushToast } from '../../notifications/notificationService';
 
 /**
  * Communications Center Feature Page.
@@ -73,13 +74,38 @@ export default function CommunicationsPage(): React.JSX.Element {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="primary" size="sm" className="font-semibold" disabled>
+          <Button
+            variant="primary"
+            size="sm"
+            className="font-semibold"
+            onClick={() => pushToast('New Broadcast Triggered', 'Opening announcement broadcasting screen configuration.', 'success')}
+          >
             <Plus className="w-4 h-4 mr-1.5" /> New Broadcast
           </Button>
-          <Button variant="danger" size="sm" className="font-semibold" disabled>
+          <Button
+            variant="danger"
+            size="sm"
+            className="font-semibold"
+            onClick={() => pushToast('Emergency Alert Broadcasted', 'Direct voice and visual evacuation overlays dispatched to all stadium sectors.', 'error')}
+          >
             <AlertOctagon className="w-4 h-4 mr-1.5" /> Emergency Alert
           </Button>
-          <Button variant="outline" size="sm" className="text-text-secondary" disabled>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-text-secondary"
+            onClick={() => {
+              const dataStr = "StadiumOps AI Announcement Broadcast Log\n=======================================\nTotal Sent: 42 announcements\nNode status: Public display boards OK.";
+              const blob = new Blob([dataStr], { type: 'text/plain;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `stadiumops_announcement_logs_${Date.now()}.txt`;
+              link.click();
+              URL.revokeObjectURL(url);
+              pushToast('Logs Exported', 'Broadcast log downloaded.', 'success');
+            }}
+          >
             <FileDown className="w-4 h-4 mr-1.5" /> Export Logs
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
@@ -199,7 +225,15 @@ export default function CommunicationsPage(): React.JSX.Element {
                 <Badge variant="danger">Critical</Badge>
               </div>
               <p className="text-xs text-text-muted">Directs crowd flow to emergency safety gates immediately.</p>
-              <Button variant="danger" size="sm" className="w-full font-semibold uppercase tracking-wider text-[11px]" disabled>
+              <Button
+                variant="danger"
+                size="sm"
+                className="w-full font-semibold uppercase tracking-wider text-[11px]"
+                onClick={() => {
+                  setInputText("CRITICAL ALERT: Emergency evacuation protocols activated. Please proceed to the nearest exit gates in an orderly fashion.");
+                  pushToast("Template Selected", "Evacuation alert text loaded into translation editor.", "info");
+                }}
+              >
                 Use Template
               </Button>
             </Card>
@@ -210,7 +244,15 @@ export default function CommunicationsPage(): React.JSX.Element {
                 <Badge variant="warning">High</Badge>
               </div>
               <p className="text-xs text-text-muted">Requesting immediate medical unit details dispatch.</p>
-              <Button variant="outline" size="sm" className="w-full text-text-secondary text-[11px]" disabled>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-text-primary text-[11px] border-stadium-warning/50 hover:bg-stadium-warning/5"
+                onClick={() => {
+                  setInputText("ATTENTION: Medical first responders are requested at sector concourse. Standby medical units activated.");
+                  pushToast("Template Selected", "Medical assist alert text loaded into translation editor.", "info");
+                }}
+              >
                 Use Template
               </Button>
             </Card>

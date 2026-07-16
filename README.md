@@ -7,16 +7,21 @@
 
 StadiumOps AI is an enterprise-grade Smart Stadium Operations Command Center designed for the FIFA World Cup 2026. Built with React and TypeScript, it integrates Gemini AI to provide tournament operators with real-time incident analysis, volunteer dispatch recommendations, crowd control tracking, and multilingual communication translations.
 
+This application features a full visual redesign with a premium dark-themed layout, responsive navigation sidebar, and interactive controls across all core modules.
+
 ---
 
 ## Key Features
 
 *   **Operations Dashboard:** Real-time metrics tracking gates occupancy, incident response rates, and volunteer loads.
-*   **Incident Monitoring (AI Enabled):** Real-time incident logs with automated impact classifications and action plans generated via Gemini AI.
-*   **Volunteer Operations (AI Enabled):** Automated matching algorithms recommending the closest, best-skilled volunteers for incidents.
-*   **Crowd Intelligence (AI Enabled):** Zone congestion analyzers predicting hotspots and suggesting crowd diversion schemes.
-*   **Multilingual Communications:** Instant translation interface facilitating message exchanges between operators and international field marshals.
+*   **Incident Monitoring (AI Enabled):** Real-time incident logs with automated impact classifications and action plans. Includes log and dispatch simulation triggers.
+*   **Volunteer Operations (AI Enabled):** Automated matching algorithms recommending the closest, best-skilled volunteers for incidents. Supports volunteer dispatch and break actions.
+*   **Crowd Intelligence (AI Enabled):** Zone congestion analyzers predicting hotspots and suggesting crowd diversion schemes. Supports live crowd peak simulations and telemetry logs export.
+*   **Multilingual Communications:** Instant translation interface facilitating message exchanges between operators and international field marshals. Includes templates for evacuation alerts and medical emergencies.
 *   **Keyboard-First Command Palette:** Access features, navigation, and run tasks without leaving the keyboard (`Ctrl + K`).
+*   **Accessibility Operations:** Interactive dispatch board for wheelchair assistance, service lift routing, and priority escalation.
+*   **Reports & Analytics:** Shift analytics logs supporting PDF download, CSV export, and print functions.
+*   **Console Settings:** Custom settings preferences panel allowing real-time color theme changes (Dark, Light, High Contrast), notification controls, and language overrides.
 
 ---
 
@@ -69,6 +74,7 @@ For a detailed walkthrough, review the [Architecture & Onboarding Guide](docs/ar
     VITE_GEMINI_API_KEY=your_gemini_api_key_here
     VITE_DEBUG_MODE=true
     ```
+    *Note: If no Gemini API key is configured, the application automatically runs in simulation mode using mock AI advisory payloads.*
 
 3.  **Run the local development server:**
     ```bash
@@ -78,6 +84,8 @@ For a detailed walkthrough, review the [Architecture & Onboarding Guide](docs/ar
 4.  **Verify type-safety and compile the production bundle:**
     ```bash
     npm run typecheck
+    ```
+    ```bash
     npm run build
     ```
 

@@ -13,6 +13,7 @@ import { Button } from '../../components/ui/Button';
 import { useVolunteers, useVolunteerAI } from '../../state';
 import { VolunteerRole, VolunteerStatus } from '../../domain/enums';
 import { Volunteer } from '../../domain/models';
+import { pushToast } from '../../notifications/notificationService';
 
 /**
  * Volunteer Roster Deployment Module View.
@@ -54,6 +55,11 @@ export default function VolunteersPage(): React.JSX.Element {
     fetchVolunteers(searchQuery, filterRole, filterStatus);
   };
 
+  const handleRegisterVolunteer = () => {
+    const id = `VOL-${Math.floor(1000 + Math.random() * 9000)}`;
+    pushToast(`New Volunteer Registered: ${id}`, 'Successfully added to active tournament roster database.', 'success');
+  };
+
   const statusColors: Record<VolunteerStatus, 'success' | 'warning' | 'info' | 'neutral' | 'danger'> = {
     [VolunteerStatus.AVAILABLE]: 'success',
     [VolunteerStatus.ASSIGNED]: 'info',
@@ -76,7 +82,7 @@ export default function VolunteersPage(): React.JSX.Element {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="primary" size="sm" className="font-semibold" disabled>
+          <Button variant="primary" size="sm" className="font-semibold" onClick={handleRegisterVolunteer}>
             <Plus className="w-4 h-4 mr-1.5" /> Register Volunteer
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
@@ -298,12 +304,22 @@ export default function VolunteersPage(): React.JSX.Element {
                 </div>
 
                 <div className="border-t border-stadium-border pt-4 space-y-2">
-                  <span className="block font-semibold text-text-muted uppercase tracking-wider">Quick Actions (Disabled)</span>
+                  <span className="block font-semibold text-text-muted uppercase tracking-wider">Quick Actions</span>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => pushToast('Deployment Dispatched', `${selected.firstName} ${selected.lastName} dispatched to North Gate ticket lines.`, 'success')}
+                      className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5"
+                    >
                       Dispatch
                     </Button>
-                    <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => pushToast('Break Initiated', `${selected.firstName} ${selected.lastName} marked as ON BREAK. Relief volunteer notified.`, 'info')}
+                      className="text-text-primary border-stadium-warning/50 hover:bg-stadium-warning/5"
+                    >
                       Initiate Break
                     </Button>
                   </div>

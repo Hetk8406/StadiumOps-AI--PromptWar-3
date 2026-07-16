@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
+import Sidebar from './Sidebar';
 import Footer from './Footer';
 import Breadcrumb from './Breadcrumb';
 import ErrorBoundary from '../ui/ErrorBoundary';
@@ -11,6 +12,8 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps): React.JSX.Element {
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Seed initial operational notifications on first mount
   useEffect(() => {
@@ -21,7 +24,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps): Rea
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary overflow-hidden relative pb-16">
+    <div className="min-h-screen flex bg-bg-primary text-text-primary overflow-hidden relative">
       {/* Skip-to-Content bypass accessibility link */}
       <a
         href="#main-content"
@@ -30,12 +33,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps): Rea
         Skip to Main Content
       </a>
 
-      {/* Header Bar */}
-      <Header />
+      {/* Navigation Sidebar */}
+      <Sidebar
+        isMobileOpen={isMobileOpen}
+        onMobileClose={() => setIsMobileOpen(false)}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      />
 
-      {/* Main Panel Wrapper */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Content Panel Box */}
+      {/* Main Content Area Container */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative pb-16">
+        {/* Header Bar */}
+        <Header onMobileMenuOpen={() => setIsMobileOpen(true)} />
+
+        {/* Content Box */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <main
             id="main-content"
@@ -53,6 +64,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps): Rea
           <Footer />
         </div>
       </div>
+
       {/* Global Toast Notification Portal */}
       <ToastContainer />
     </div>

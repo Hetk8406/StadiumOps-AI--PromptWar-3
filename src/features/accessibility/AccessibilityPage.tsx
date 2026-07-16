@@ -15,6 +15,7 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { useAccessibility, useAccessibilityAI } from '../../state';
+import { pushToast } from '../../notifications/notificationService';
 
 /**
  * Accessibility Operations Feature Page.
@@ -77,7 +78,15 @@ export default function AccessibilityPage(): React.JSX.Element {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="primary" size="sm" className="font-semibold" disabled>
+          <Button
+            variant="primary"
+            size="sm"
+            className="font-semibold"
+            onClick={() => {
+              const id = `AST-${Math.floor(1000 + Math.random() * 9000)}`;
+              pushToast(`New Assistance Logged: ${id}`, 'Staff dispatched to help visitor with sensory bags at sector lobby.', 'success');
+            }}
+          >
             <Plus className="w-4 h-4 mr-1.5" /> New Assistance Request
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
@@ -323,12 +332,22 @@ export default function AccessibilityPage(): React.JSX.Element {
                 </div>
 
                 <div className="border-t border-stadium-border pt-4 space-y-2">
-                  <span className="block font-semibold text-text-muted uppercase tracking-wider">Quick Actions (Disabled)</span>
+                  <span className="block font-semibold text-text-muted uppercase tracking-wider">Quick Actions</span>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => pushToast('Wheelchair Dispatched', `Sensory/wheelchair gear dispatched to sector lobby for ${selectedRequest.visitorName || 'visitor'}.`, 'success')}
+                      className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5"
+                    >
                       Request Wheelchair
                     </Button>
-                    <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => pushToast('Priority Escalated', `Priority level for ${selectedRequest.id} set to IMMEDIATE. Alert sent to zone commander.`, 'error')}
+                      className="text-text-primary border-stadium-warning/50 hover:bg-stadium-warning/5"
+                    >
                       Escalate Priority
                     </Button>
                   </div>

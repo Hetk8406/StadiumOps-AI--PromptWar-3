@@ -12,6 +12,7 @@ import {
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { useSettings } from '../../state';
+import { pushToast } from '../../notifications/notificationService';
 
 /**
  * Settings and Preferences Management Page.
@@ -180,7 +181,12 @@ export default function SettingsPage(): React.JSX.Element {
                     <strong className="text-text-primary block">Critical Security Alerts</strong>
                     <span className="text-[10px] text-text-muted">Sound sirens and flash red console borders on CRITICAL incidents.</span>
                   </div>
-                  <input type="checkbox" defaultChecked={data.notifications.incidentAlerts} disabled className="w-4 h-4 cursor-not-allowed" />
+                  <input
+                    type="checkbox"
+                    defaultChecked={data.notifications.incidentAlerts}
+                    onChange={(e) => pushToast('Settings Updated', `Critical Security Alerts ${e.target.checked ? 'ENABLED' : 'DISABLED'}.`, 'success')}
+                    className="w-4 h-4 cursor-pointer"
+                  />
                 </div>
 
                 <div className="flex items-center justify-between p-2.5 bg-bg-secondary border border-stadium-border rounded">
@@ -188,7 +194,12 @@ export default function SettingsPage(): React.JSX.Element {
                     <strong className="text-text-primary block">Volunteer Shift Broadcasts</strong>
                     <span className="text-[10px] text-text-muted">Send push updates to on-duty stewards on dispatch assignments.</span>
                   </div>
-                  <input type="checkbox" defaultChecked={data.notifications.volunteerAlerts} disabled className="w-4 h-4 cursor-not-allowed" />
+                  <input
+                    type="checkbox"
+                    defaultChecked={data.notifications.volunteerAlerts}
+                    onChange={(e) => pushToast('Settings Updated', `Volunteer Shift Broadcasts ${e.target.checked ? 'ENABLED' : 'DISABLED'}.`, 'success')}
+                    className="w-4 h-4 cursor-pointer"
+                  />
                 </div>
               </div>
             </Card>

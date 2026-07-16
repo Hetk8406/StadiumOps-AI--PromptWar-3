@@ -6,7 +6,7 @@
 
 import React, { memo, useState } from 'react';
 import {
-  Bell,
+  BellRing,
   X,
   CheckCheck,
   Trash2,
@@ -42,11 +42,11 @@ const NotificationCenter = memo(function NotificationCenter() {
         aria-label={`Notifications — ${unreadCount} unread`}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="relative p-1.5 rounded text-text-muted hover:text-text-primary focus:outline-none focus:ring-1 focus:ring-stadium-accent motion-focus-ring transition-colors"
+        className="relative p-2 rounded text-text-muted hover:text-text-primary focus:outline-none focus:ring-1 focus:ring-stadium-accent motion-focus-ring transition-colors"
       >
-        <Bell className="w-4 h-4" />
+        <BellRing className="w-6 h-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 flex items-center justify-center rounded-full bg-stadium-critical text-[9px] font-bold text-white px-0.5 leading-none motion-fade-in">
+          <span className="absolute top-0 right-0 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-stadium-critical text-[9px] font-bold text-white px-1 leading-none motion-fade-in">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -67,7 +67,7 @@ const NotificationCenter = memo(function NotificationCenter() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-stadium-border">
             <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-stadium-accent" />
+              <BellRing className="w-5 h-5 text-stadium-accent" />
               <h2 className="text-sm font-bold text-text-primary">Notifications</h2>
               {unreadCount > 0 && (
                 <span className="px-1.5 py-0.5 bg-stadium-critical text-white text-[9px] font-bold rounded-full">

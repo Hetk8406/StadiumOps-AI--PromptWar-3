@@ -6,7 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { X, LayoutDashboard, AlertTriangle, Users, Activity, MessageSquare, Accessibility, FileText, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, LayoutDashboard, AlertTriangle, Users, Activity, MessageSquare, Accessibility, FileText, Settings } from 'lucide-react';
 import { ROUTES } from '../../config/constants';
 import { Button } from '../ui/Button';
 
@@ -14,14 +14,14 @@ interface SidebarProps {
   isMobileOpen: boolean;
   onMobileClose: () => void;
   isCollapsed: boolean;
-  onToggleCollapse: () => void;
+  onToggleCollapse?: () => void;
 }
 
 export default function Sidebar({
   isMobileOpen,
   onMobileClose,
   isCollapsed,
-  onToggleCollapse,
+  onToggleCollapse: _onToggleCollapse,
 }: SidebarProps): React.JSX.Element {
   const navItems = [
     { name: 'Dashboard', path: ROUTES.DASHBOARD, icon: LayoutDashboard },
@@ -49,18 +49,18 @@ export default function Sidebar({
       {/* Premium Desktop Sidebar Brand Header */}
       <div className="flex items-center gap-3 px-6 py-4.5 border-b border-stadium-border/60">
         <div className="w-7 h-7 bg-stadium-accent rounded flex items-center justify-center font-black text-white text-xs shadow-md shrink-0">
-          SO
+          FC
         </div>
         {!isCollapsed && (
           <span className="font-extrabold tracking-widest text-xs text-text-primary uppercase truncate">
-            STADIUMOPS AI
+            FIFA 2026 COMMAND
           </span>
         )}
       </div>
 
       {/* Header for Mobile Drawer Mode only */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-stadium-border">
-        <span className="font-bold tracking-wider text-sm text-stadium-accent">STADIUMOPS AI</span>
+        <span className="font-bold tracking-wider text-sm text-stadium-accent">FIFA 2026 COMMAND</span>
         <Button
           variant="outline"
           size="sm"
@@ -94,18 +94,6 @@ export default function Sidebar({
           </NavLink>
         ))}
       </nav>
-
-      {/* Collapse Action Toggle Buttons (Desktop only) */}
-      <div className="hidden md:block p-4 border-t border-stadium-border">
-        <Button
-          variant="outline"
-          onClick={onToggleCollapse}
-          className="w-full justify-center p-2 text-text-secondary"
-          aria-label={isCollapsed ? 'Expand sidebar panel' : 'Collapse sidebar panel'}
-        >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </Button>
-      </div>
     </div>
   );
 

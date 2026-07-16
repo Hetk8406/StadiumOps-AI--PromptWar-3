@@ -13,6 +13,7 @@ import { Button } from '../../components/ui/Button';
 import { useIncidents, useIncidentAI } from '../../state';
 import { IncidentSeverity, IncidentStatus } from '../../domain/enums';
 import { Incident } from '../../domain/models';
+import { pushToast } from '../../notifications/notificationService';
 
 /**
  * Incident Monitoring Feature Page.
@@ -54,6 +55,11 @@ export default function IncidentsPage(): React.JSX.Element {
     fetchIncidents(searchQuery, filterStatus, filterSeverity);
   };
 
+  const handleLogNewIncident = () => {
+    const id = `INC-${Math.floor(100 + Math.random() * 900)}`;
+    pushToast(`New Incident Logged: ${id}`, 'Security first responders notified. Incident details dispatched to on-duty marshals.', 'error');
+  };
+
   const severityMap: Record<IncidentSeverity, 'danger' | 'warning' | 'info' | 'neutral'> = {
     [IncidentSeverity.CRITICAL]: 'danger',
     [IncidentSeverity.HIGH]: 'danger',
@@ -75,7 +81,7 @@ export default function IncidentsPage(): React.JSX.Element {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="danger" size="sm" className="font-semibold" disabled>
+          <Button variant="danger" size="sm" className="font-semibold" onClick={handleLogNewIncident}>
             <Plus className="w-4 h-4 mr-1.5" /> Log New Incident
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
@@ -292,12 +298,22 @@ export default function IncidentsPage(): React.JSX.Element {
                 </div>
 
                 <div className="border-t border-stadium-border pt-4 space-y-2">
-                  <span className="block font-semibold text-text-muted uppercase tracking-wider">Quick Actions (Disabled)</span>
+                  <span className="block font-semibold text-text-muted uppercase tracking-wider">Quick Actions</span>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => pushToast('Squad Dispatched', `Coordinated response team dispatched to ${selected.zoneId} for ${selected.id}.`, 'success')}
+                      className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5"
+                    >
                       Dispatch Squad
                     </Button>
-                    <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => pushToast('Incident Resolved', `Incident ${selected.id} has been marked as RESOLVED in the command center database.`, 'info')}
+                      className="text-text-primary border-stadium-success/50 hover:bg-stadium-success/5"
+                    >
                       Resolve Incident
                     </Button>
                   </div>

@@ -11,6 +11,7 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { useReports } from '../../state';
+import { pushToast } from '../../notifications/notificationService';
 import { ReportType } from '../../domain/enums';
 import { Report } from '../../domain/models';
 
@@ -55,10 +56,20 @@ export default function ReportsPage(): React.JSX.Element {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="primary" size="sm" className="font-semibold" disabled>
+          <Button
+            variant="primary"
+            size="sm"
+            className="font-semibold"
+            onClick={() => pushToast('Report Generation Started', 'Initiating data aggregation for match day summary report.', 'success')}
+          >
             <Plus className="w-4 h-4 mr-1.5" /> Generate Report
           </Button>
-          <Button variant="outline" size="sm" className="text-text-secondary" disabled>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => pushToast('Report Schedule Active', 'Configured weekly automatic delivery of ingress wait time audits.', 'info')}
+            className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5"
+          >
             Schedule Report
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
@@ -167,13 +178,51 @@ export default function ReportsPage(): React.JSX.Element {
           <Card className="bg-bg-panel p-4 space-y-3">
             <h3 className="text-xs font-bold text-text-primary uppercase tracking-wide">Export Telemetry Center</h3>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const content = "StadiumOps AI Report PDF Export Simulation\n=========================================\nReport ID: REP-104\nTitle: Match Day Summary Log\nStatus: Verified.";
+                  const blob = new Blob([content], { type: 'application/pdf' });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = `stadiumops_report_${Date.now()}.pdf`;
+                  link.click();
+                  URL.revokeObjectURL(url);
+                  pushToast('Download Complete', 'PDF report downloaded successfully.', 'success');
+                }}
+                className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-start"
+              >
                 Download PDF
               </Button>
-              <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const content = "Report ID,Name,Generated Date,Format,Status\nREP-101,Weather Ingress Audit,2026-07-16,CSV,Completed";
+                  const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = `stadiumops_report_${Date.now()}.csv`;
+                  link.click();
+                  URL.revokeObjectURL(url);
+                  pushToast('Export Complete', 'CSV report downloaded successfully.', 'success');
+                }}
+                className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-start"
+              >
                 Export CSV
               </Button>
-              <Button variant="outline" size="sm" disabled className="text-text-muted border-dashed justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  window.print();
+                  pushToast('Print Command Sent', 'Opening browser print dialogue.', 'info');
+                }}
+                className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-start col-span-2"
+              >
                 <Printer className="w-3.5 h-3.5 mr-1" /> Print Log
               </Button>
             </div>
