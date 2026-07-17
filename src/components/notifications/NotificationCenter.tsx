@@ -30,27 +30,42 @@ const SEVERITY_ICON: Record<NotificationSeverity, React.ReactNode> = {
   success: <CheckCircle2 className="w-3.5 h-3.5 text-stadium-success" />,
 };
 
-const NotificationCenter = memo(function NotificationCenter() {
+interface NotificationCenterProps {
+  trigger?: React.ReactNode;
+}
+
+const NotificationCenter = memo(function NotificationCenter({ trigger }: NotificationCenterProps) {
   const [open, setOpen] = useState(false);
   const { notifications, unreadCount, markAllAsRead, clearNonCritical } = useNotifications();
 
+  const renderedTrigger = trigger ? (
+    React.cloneElement(trigger as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void; 'aria-expanded'?: boolean }>, {
+      onClick: (e: React.MouseEvent) => {
+        e.preventDefault();
+        setOpen((o) => !o);
+      },
+      'aria-expanded': open,
+    })
+  ) : (
+    <button
+      type="button"
+      aria-label={`Notifications — ${unreadCount} unread`}
+      aria-expanded={open}
+      onClick={() => setOpen((o) => !o)}
+      className="relative p-2 rounded text-[#9ca3af] hover:text-stadium-accent focus:outline-none focus:ring-1 focus:ring-stadium-accent motion-focus-ring transition-colors duration-200"
+    >
+      <BellRing className="w-5 h-5" />
+      {unreadCount > 0 && (
+        <span className="absolute top-0 right-0 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-stadium-critical text-[9px] font-bold text-white px-1 leading-none motion-fade-in">
+          {unreadCount > 9 ? '9+' : unreadCount}
+        </span>
+      )}
+    </button>
+  );
+
   return (
     <>
-      {/* Trigger Bell */}
-      <button
-        type="button"
-        aria-label={`Notifications — ${unreadCount} unread`}
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-        className="relative p-2 rounded text-text-muted hover:text-text-primary focus:outline-none focus:ring-1 focus:ring-stadium-accent motion-focus-ring transition-colors"
-      >
-        <BellRing className="w-6 h-6" />
-        {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-stadium-critical text-[9px] font-bold text-white px-1 leading-none motion-fade-in">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        )}
-      </button>
+      {renderedTrigger}
 
       {/* Overlay */}
       {open && (
@@ -81,7 +96,7 @@ const NotificationCenter = memo(function NotificationCenter() {
               onClick={() => setOpen(false)}
               className="p-1 text-text-muted hover:text-text-primary rounded focus:outline-none focus:ring-1 focus:ring-stadium-accent motion-focus-ring"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 

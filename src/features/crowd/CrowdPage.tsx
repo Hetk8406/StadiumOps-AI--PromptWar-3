@@ -91,55 +91,55 @@ export default function CrowdPage(): React.JSX.Element {
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleSimulation} className={isSimulating ? 'text-red-500 border-red-500/30 bg-red-500/5' : 'text-text-secondary'}>
-            <Play className="w-4 h-4 mr-1.5" /> {isSimulating ? 'Stop Sim' : 'Simulation'}
+            <Play className="w-5 h-5 mr-2" /> {isSimulating ? 'Stop Sim' : 'Simulation'}
           </Button>
           <Button variant="outline" size="sm" onClick={handleExportLogs} className="text-text-secondary">
-            <Download className="w-4 h-4 mr-1.5" /> Export Logs
+            <Download className="w-5 h-5 mr-2" /> Export Logs
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-4 h-4 ${zones.loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${zones.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
 
-      {/* SUMMARY TELEMETRY CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        <Card className="p-4 bg-bg-panel">
-          <div className="text-xs font-semibold text-text-muted uppercase">Total Ingress</div>
-          <div className="text-2xl font-extrabold text-text-primary mt-2">74,812</div>
-          <p className="text-[10px] text-text-muted mt-1">Total stadium capacity: 82.5k</p>
+      {/* ROW 1: SUMMARY TELEMETRY CARDS (FULL WIDTH RIBBON) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="p-4 bg-bg-panel border border-white/[0.04] flex flex-col justify-between hover:border-stadium-accent/30 transition-all min-h-[100px]">
+          <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Total Ingress</div>
+          <div className="text-2xl font-black text-text-primary mt-1">74,812</div>
+          <p className="text-[9px] text-text-muted mt-1">Total stadium capacity: 82.5k</p>
         </Card>
-        <Card className="p-4 bg-bg-panel">
-          <div className="text-xs font-semibold text-stadium-accent uppercase">Average Ingress</div>
-          <div className="text-2xl font-extrabold text-stadium-accent mt-2">72%</div>
-          <p className="text-[10px] text-text-muted mt-1">Stands occupancy matches</p>
+        <Card className="p-4 bg-bg-panel border border-white/[0.04] flex flex-col justify-between hover:border-stadium-accent/30 transition-all min-h-[100px]">
+          <div className="text-[10px] font-bold text-stadium-accent uppercase tracking-wider">Average Ingress</div>
+          <div className="text-2xl font-black text-stadium-accent mt-1">72%</div>
+          <p className="text-[9px] text-text-muted mt-1">Stands occupancy matches</p>
         </Card>
-        <Card className="p-4 bg-bg-panel">
-          <div className="text-xs font-semibold text-stadium-warning uppercase">Peak Density Zone</div>
-          <div className="text-2xl font-extrabold text-stadium-warning mt-2">SOUTH STAND</div>
-          <p className="text-[10px] text-stadium-warning font-semibold mt-1">90% Capacity exceeded</p>
+        <Card className="p-4 bg-bg-panel border border-white/[0.04] flex flex-col justify-between hover:border-stadium-accent/30 transition-all min-h-[100px]">
+          <div className="text-[10px] font-bold text-stadium-warning uppercase tracking-wider">Peak Density Zone</div>
+          <div className="text-2xl font-black text-stadium-warning mt-1">SOUTH STAND</div>
+          <p className="text-[9px] text-stadium-warning font-semibold mt-1">90% Capacity exceeded</p>
         </Card>
-        <Card className="p-4 bg-bg-panel">
-          <div className="text-xs font-semibold text-stadium-success uppercase">Average Wait Time</div>
-          <div className="text-2xl font-extrabold text-stadium-success mt-2">6.8 MIN</div>
-          <p className="text-[10px] text-text-muted mt-1">Turnstile SLAs maintained</p>
+        <Card className="p-4 bg-bg-panel border border-white/[0.04] flex flex-col justify-between hover:border-stadium-accent/30 transition-all min-h-[100px]">
+          <div className="text-[10px] font-bold text-stadium-success uppercase tracking-wider">Average Wait Time</div>
+          <div className="text-2xl font-black text-stadium-success mt-1">6.8 MIN</div>
+          <p className="text-[9px] text-text-muted mt-1">Turnstile SLAs maintained</p>
         </Card>
       </div>
 
-      {/* SEARCH AND MAP SPLIT SECTION */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      {/* ROW 2: 60/40 SPLIT GRID */}
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
         
-        {/* LEFT COLUMN: INTERACTIVE MAP & DETAILS */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Left Column (60% width): Interactive Map with Embedded Details */}
+        <div className="w-full lg:w-[60%] space-y-4">
           <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider font-mono">Stadium Map Overlays</h2>
 
           {zones.loading ? (
-            <div className="h-96 bg-bg-panel border border-stadium-border rounded animate-pulse" />
+            <div className="h-96 bg-bg-panel border border-stadium-border rounded-xl animate-pulse" />
           ) : (
-            <div className="p-4 bg-bg-panel border border-stadium-border rounded flex flex-col md:flex-row gap-6">
+            <div className="p-5 bg-bg-panel border border-stadium-border rounded-xl flex flex-col space-y-5">
               
               {/* STYLISH SVG MAP VECTOR PLOT */}
-              <div className="flex-1 max-w-[400px] mx-auto">
+              <div className="max-w-[300px] mx-auto w-full">
                 <svg viewBox="0 0 400 400" className="w-full h-auto" aria-label="Stadium interactive stand layout">
                   {/* Outer Concourse Ring */}
                   <rect x="10" y="10" width="380" height="380" rx="190" fill="none" stroke="#2a2e35" strokeWidth="6" />
@@ -169,122 +169,44 @@ export default function CrowdPage(): React.JSX.Element {
                 </svg>
               </div>
 
-              {/* DETAILS PANEL HUD */}
-              <div className="w-full md:w-[260px] space-y-4">
+              {/* Embedded Stand Details context block */}
+              <div className="border-t border-white/[0.04] pt-4">
                 {selectedZone ? (
-                  <Card className="bg-bg-secondary p-4 space-y-3 border-stadium-border/60">
-                    <div>
-                      <strong className="text-xs text-text-muted uppercase tracking-wider block">Stand Details</strong>
-                      <h3 className="text-sm font-bold text-text-primary mt-1">{selectedZone.name}</h3>
+                  <div className="bg-[#0a0b0d] p-4 rounded-lg border border-white/[0.03] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-text-muted uppercase tracking-wider font-bold">Stand Quadrant Telemetry</span>
+                      <Badge variant={statusColors[selectedZone.status]}>{selectedZone.status}</Badge>
                     </div>
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-text-muted">Total Capacity</span>
-                        <span className="text-text-primary font-bold">{selectedZone.capacity}</span>
+                    <div className="grid grid-cols-3 gap-4 text-xs">
+                      <div>
+                        <span className="text-text-muted block text-[10px] uppercase">Stand Name</span>
+                        <strong className="text-text-primary font-bold text-sm block mt-0.5">{selectedZone.name}</strong>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-text-muted">Occupancy</span>
-                        <span className="text-text-primary font-bold">{selectedZone.currentOccupancy}</span>
+                      <div>
+                        <span className="text-text-muted block text-[10px] uppercase">Total Capacity</span>
+                        <strong className="text-text-primary font-bold text-sm block mt-0.5">{selectedZone.capacity.toLocaleString()}</strong>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-text-muted">Status</span>
-                        <Badge variant={statusColors[selectedZone.status]}>{selectedZone.status}</Badge>
+                      <div>
+                        <span className="text-text-muted block text-[10px] uppercase">Current Occupancy</span>
+                        <strong className="text-text-primary font-bold text-sm block mt-0.5">{selectedZone.currentOccupancy.toLocaleString()}</strong>
                       </div>
                     </div>
-                  </Card>
+                  </div>
                 ) : (
-                  <div className="text-xs text-text-muted p-4 text-center border border-dashed border-stadium-border rounded">
-                    Tap a stadium stand quadrant to inspect telemetry and density meters.
+                  <div className="text-xs text-text-muted py-3 text-center border border-dashed border-stadium-border rounded-lg bg-[#0a0b0d]/30">
+                    Tap a stadium stand quadrant on the SVG map above to view inline occupancy diagnostics.
                   </div>
                 )}
               </div>
             </div>
           )}
-
-          {/* AI CROWD ADVISORY SUPPORT */}
-          <Card className="bg-bg-panel p-4 space-y-3 text-xs text-text-secondary">
-            <div className="flex items-center justify-between border-b border-stadium-border pb-3">
-              <span className="font-bold text-stadium-accent uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-stadium-accent" /> AI Crowd Flow redistribution advisory
-              </span>
-              {recommendations && (
-                <span className="text-[10px] text-text-muted">
-                  Confidence: <strong className="text-stadium-success">{recommendations.confidenceCategory} ({Math.round(recommendations.confidence * 100)}%)</strong>
-                </span>
-              )}
-            </div>
-
-            {analyzing ? (
-              <div className="p-4 bg-bg-secondary border border-stadium-border rounded text-center text-text-muted flex flex-col items-center gap-2">
-                <RefreshCw className="w-5 h-5 text-stadium-accent animate-spin" />
-                <span>Gemini AI is processing queue lengths and flows rates...</span>
-              </div>
-            ) : aiError ? (
-              <div className="p-3 bg-stadium-critical/10 border border-stadium-critical/30 rounded text-stadium-critical text-xs">
-                <strong>Advisory Failed:</strong> {aiError}
-                <Button variant="outline" size="sm" onClick={() => recommendCrowdFlow(gates.data || [])} className="w-full mt-2 text-stadium-critical hover:bg-stadium-critical/10">
-                  Retry Advisory
-                </Button>
-              </div>
-            ) : recommendations ? (
-              <div className="space-y-3 bg-bg-secondary p-3 border border-stadium-border rounded text-[11px] leading-relaxed">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">Overall Congestion Risk</strong>
-                    <Badge variant={recommendations.congestionRiskLevel === 'CRITICAL' || recommendations.congestionRiskLevel === 'HIGH' ? 'danger' : 'warning'}>
-                      {recommendations.congestionRiskLevel}
-                    </Badge>
-                  </div>
-                  <div>
-                    <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">Predicted Wait Time</strong>
-                    <span className="text-text-primary font-bold">{recommendations.predictedWaitTimeMinutes} Min</span>
-                  </div>
-                </div>
-
-                {recommendations.bottleneckGates.length > 0 && (
-                  <div>
-                    <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">Bottleneck Turnstiles</strong>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {recommendations.bottleneckGates.map((gateName, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded bg-stadium-critical/15 text-stadium-critical text-[9px] font-bold">
-                          {gateName}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">AI Redistribution Advice</strong>
-                  <p className="text-text-primary mt-0.5">{recommendations.explanation}</p>
-                </div>
-
-                <div>
-                  <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">Suggested Action Guidelines</strong>
-                  <ul className="list-disc pl-4 mt-1 space-y-1 text-text-primary">
-                    {recommendations.recommendedFlowRedirections.map((redir, i) => (
-                      <li key={i}>{redir}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <Button variant="outline" size="sm" onClick={() => recommendCrowdFlow(gates.data || [])} className="w-full text-text-secondary border-dashed mt-2">
-                  Refresh Advisory
-                </Button>
-              </div>
-            ) : (
-              <Button variant="outline" size="sm" onClick={() => recommendCrowdFlow(gates.data || [])} className="w-full font-semibold border-stadium-accent/40 text-stadium-accent hover:bg-stadium-accent/5">
-                Optimize Transit & Flow with Gemini AI
-              </Button>
-            )}
-          </Card>
         </div>
 
-        {/* RIGHT COLUMN: GATES WAITING QUEUE LIST */}
-        <div className="space-y-4">
+        {/* Right Column (40% width): Gate Telemetry & Queue list */}
+        <div className="w-full lg:w-[40%] space-y-4">
           <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider font-mono">Gate Telemetry & Queue</h2>
 
-          <div className="p-3 bg-bg-panel border border-stadium-border rounded-md relative flex items-center mb-3">
+          <div className="p-3 bg-bg-panel border border-stadium-border rounded-xl relative flex items-center mb-3">
             <Search className="w-3.5 h-3.5 text-text-muted absolute left-6" />
             <input
               type="search"
@@ -297,14 +219,13 @@ export default function CrowdPage(): React.JSX.Element {
 
           {gates.loading ? (
             <div className="space-y-3 animate-pulse" aria-busy="true">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className="h-16 bg-bg-panel border border-stadium-border rounded" />
-              ))}
+              <div className="h-16 bg-bg-panel border border-stadium-border rounded-xl" />
+              <div className="h-16 bg-bg-panel border border-stadium-border rounded-xl" />
             </div>
           ) : (
-            <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
               {filteredGates?.map((gate: Gate) => (
-                <div key={gate.id} className="p-3.5 bg-bg-panel border border-stadium-border rounded flex items-center justify-between hover:border-stadium-accent transition-colors">
+                <div key={gate.id} className="p-3.5 bg-bg-panel border border-stadium-border rounded-xl flex items-center justify-between hover:border-stadium-accent transition-colors">
                   <div>
                     <h4 className="text-xs font-bold text-text-primary">{gate.name}</h4>
                     <span className="text-[10px] text-text-muted">Queue size: {gate.queueLength} travelers</span>
@@ -321,7 +242,86 @@ export default function CrowdPage(): React.JSX.Element {
             </div>
           )}
         </div>
+      </div>
 
+      {/* ROW 3: AI CROWD ADVISORY SUPPORT (FULL WIDTH RIBBON) */}
+      <div className="w-full pt-2">
+        <Card className="bg-bg-panel p-5 space-y-4 text-xs text-text-secondary border border-stadium-border rounded-xl">
+          <div className="flex items-center justify-between border-b border-stadium-border pb-3">
+            <span className="font-bold text-stadium-accent uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-stadium-accent animate-pulse" /> AI Crowd Flow redistribution advisory
+            </span>
+            {recommendations && (
+              <span className="text-[10px] text-text-muted">
+                Confidence: <strong className="text-stadium-success">{recommendations.confidenceCategory} ({Math.round(recommendations.confidence * 100)}%)</strong>
+              </span>
+            )}
+          </div>
+
+          {analyzing ? (
+            <div className="p-4 bg-bg-secondary border border-stadium-border rounded-xl text-center text-text-muted flex flex-col items-center gap-2">
+              <RefreshCw className="w-5 h-5 text-stadium-accent animate-spin" />
+              <span>Gemini AI is processing queue lengths and flows rates...</span>
+            </div>
+          ) : aiError ? (
+            <div className="p-3 bg-stadium-critical/10 border border-stadium-critical/30 rounded text-stadium-critical text-xs">
+              <strong>Advisory Failed:</strong> {aiError}
+              <Button variant="outline" size="sm" onClick={() => recommendCrowdFlow(gates.data || [])} className="w-full mt-2 text-stadium-critical hover:bg-stadium-critical/10">
+                Retry Advisory
+              </Button>
+            </div>
+          ) : recommendations ? (
+            <div className="space-y-3 bg-bg-secondary p-4 border border-stadium-border rounded-xl text-[11px] leading-relaxed">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">Overall Congestion Risk</strong>
+                  <Badge variant={recommendations.congestionRiskLevel === 'CRITICAL' || recommendations.congestionRiskLevel === 'HIGH' ? 'danger' : 'warning'}>
+                    {recommendations.congestionRiskLevel}
+                  </Badge>
+                </div>
+                <div>
+                  <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">Predicted Wait Time</strong>
+                  <span className="text-text-primary font-bold">{recommendations.predictedWaitTimeMinutes} Min</span>
+                </div>
+              </div>
+
+              {recommendations.bottleneckGates.length > 0 && (
+                <div>
+                  <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">Bottleneck Turnstiles</strong>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {recommendations.bottleneckGates.map((gateName, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded bg-stadium-critical/15 text-stadium-critical text-[9px] font-bold">
+                        {gateName}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">AI Redistribution Advice</strong>
+                <p className="text-text-primary mt-0.5">{recommendations.explanation}</p>
+              </div>
+
+              <div>
+                <strong className="block text-text-muted uppercase text-[9px] tracking-wide mb-0.5">Suggested Action Guidelines</strong>
+                <ul className="list-disc pl-4 mt-1 space-y-1 text-text-primary">
+                  {recommendations.recommendedFlowRedirections.map((redir, i) => (
+                    <li key={i}>{redir}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <Button variant="outline" size="sm" onClick={() => recommendCrowdFlow(gates.data || [])} className="w-full text-text-secondary border-dashed mt-2">
+                Refresh Advisory
+              </Button>
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => recommendCrowdFlow(gates.data || [])} className="w-full font-semibold border-stadium-accent/40 text-stadium-accent hover:bg-stadium-accent/5">
+              Optimize Transit & Flow with Gemini AI
+            </Button>
+          )}
+        </Card>
       </div>
     </div>
   );

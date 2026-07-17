@@ -75,7 +75,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </svg>
         )}
         {!isLoading && leftIcon && <span className="mr-2 inline-flex" aria-hidden="true">{leftIcon}</span>}
-        <span>{children}</span>
+        {children}
         {!isLoading && rightIcon && <span className="ml-2 inline-flex" aria-hidden="true">{rightIcon}</span>}
       </button>
     );

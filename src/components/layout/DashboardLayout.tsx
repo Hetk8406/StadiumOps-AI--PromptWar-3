@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
-import Breadcrumb from './Breadcrumb';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import ToastContainer from '../notifications/ToastContainer';
 import { pushNotification, pushToast } from '../../notifications/notificationService';
@@ -14,6 +12,15 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps): React.JSX.Element {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Seed initial operational notifications on first mount
   useEffect(() => {
@@ -42,10 +49,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps): Rea
       />
 
       {/* Main Content Area Container */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative pb-16">
-        {/* Header Bar */}
-        <Header onMobileMenuOpen={() => setIsMobileOpen(true)} />
-
+      <div 
+        className="flex-1 flex flex-col min-w-0 overflow-hidden relative pb-16 transition-all duration-200 ease-in-out"
+        style={{ marginLeft: isDesktop ? (isCollapsed ? '80px' : '260px') : '0px' }}
+      >
         {/* Content Box */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <main
@@ -54,8 +61,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps): Rea
             tabIndex={-1}
           >
             <ErrorBoundary>
-              {/* Dynamic Path Breadcrumbs */}
-              <Breadcrumb />
               {children}
             </ErrorBoundary>
           </main>

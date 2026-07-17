@@ -62,8 +62,8 @@ export const AlertBanner = memo(function AlertBanner({
         </button>
       )}
       {onDismiss !== undefined && (
-        <button type="button" aria-label="Dismiss banner" onClick={handleDismiss} className="ml-2 hover:opacity-70 motion-focus-ring focus:outline-none focus:ring-1 rounded">
-          <X className="w-3.5 h-3.5" />
+        <button type="button" aria-label="Dismiss banner" onClick={handleDismiss} className="ml-2 hover:opacity-70 motion-focus-ring focus:outline-none focus:ring-1 rounded p-0.5">
+          <X className="w-5 h-5" />
         </button>
       )}
     </div>

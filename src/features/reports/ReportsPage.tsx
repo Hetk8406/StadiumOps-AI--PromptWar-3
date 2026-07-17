@@ -62,7 +62,7 @@ export default function ReportsPage(): React.JSX.Element {
             className="font-semibold"
             onClick={() => pushToast('Report Generation Started', 'Initiating data aggregation for match day summary report.', 'success')}
           >
-            <Plus className="w-4 h-4 mr-1.5" /> Generate Report
+            <Plus className="w-5 h-5 mr-2" /> Generate Report
           </Button>
           <Button
             variant="outline"
@@ -73,22 +73,78 @@ export default function ReportsPage(): React.JSX.Element {
             Schedule Report
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-4 h-4 ${reports.loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${reports.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
 
-      {/* SUMMARY CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        <Card className="p-4 bg-bg-panel">
-          <div className="text-xs font-semibold text-text-muted uppercase">Reports Generated</div>
-          <div className="text-2xl font-extrabold text-text-primary mt-2">186</div>
+      {/* SUMMARY CARDS & EXPORT TELEMETRY GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-4 bg-bg-panel flex flex-col justify-between min-h-[100px]">
+          <div>
+            <div className="text-xs font-semibold text-text-muted uppercase">Reports Generated</div>
+            <div className="text-2xl font-extrabold text-text-primary mt-2">186</div>
+          </div>
           <p className="text-[10px] text-text-muted mt-1">Active match shift logs</p>
         </Card>
-        <Card className="p-4 bg-bg-panel">
-          <div className="text-xs font-semibold text-stadium-accent uppercase">Today's Reports</div>
-          <div className="text-2xl font-extrabold text-stadium-accent mt-2">12</div>
+        <Card className="p-4 bg-bg-panel flex flex-col justify-between min-h-[100px]">
+          <div>
+            <div className="text-xs font-semibold text-stadium-accent uppercase">Today's Reports</div>
+            <div className="text-2xl font-extrabold text-stadium-accent mt-2">12</div>
+          </div>
           <p className="text-[10px] text-text-muted mt-1">Ready for download</p>
+        </Card>
+        <Card className="p-4 bg-bg-panel flex flex-col justify-between min-h-[100px]">
+          <div className="text-xs font-semibold text-text-primary uppercase tracking-wide">Export Telemetry Center</div>
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const content = "StadiumOps AI Report PDF Export Simulation\n=========================================\nReport ID: REP-104\nTitle: Match Day Summary Log\nStatus: Verified.";
+                const blob = new Blob([content], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `stadiumops_report_${Date.now()}.pdf`;
+                link.click();
+                URL.revokeObjectURL(url);
+                pushToast('Download Complete', 'PDF report downloaded successfully.', 'success');
+              }}
+              className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-center py-1 text-[10px]"
+            >
+              PDF
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const content = "Report ID,Name,Generated Date,Format,Status\nREP-101,Weather Ingress Audit,2026-07-16,CSV,Completed";
+                const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `stadiumops_report_${Date.now()}.csv`;
+                link.click();
+                URL.revokeObjectURL(url);
+                pushToast('Export Complete', 'CSV report downloaded successfully.', 'success');
+              }}
+              className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-center py-1 text-[10px]"
+            >
+              CSV
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                window.print();
+                pushToast('Print Command Sent', 'Opening browser print dialogue.', 'info');
+              }}
+              className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-center py-1 text-[10px]"
+            >
+              <Printer className="w-3.5 h-3.5 mr-1" /> Print
+            </Button>
+          </div>
         </Card>
       </div>
 
@@ -121,114 +177,53 @@ export default function ReportsPage(): React.JSX.Element {
       </form>
 
       {/* DUAL WORKSPACE SPLIT PANEL */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        
-        {/* LEFT COLUMN: RECENT REPORTS TABLE */}
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider font-mono">Recent Reports Logs</h2>
+      <div className="space-y-4">
+        <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider font-mono">Recent Reports Logs</h2>
 
-          {reports.loading ? (
-            <div className="space-y-3 animate-pulse" aria-hidden="true">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className="h-16 bg-bg-panel border border-stadium-border rounded" />
-              ))}
-            </div>
-          ) : filteredReports?.length === 0 ? (
-            <div className="p-12 text-center bg-bg-panel border border-dashed border-stadium-border rounded flex flex-col items-center justify-center">
-              <Inbox className="w-12 h-12 text-text-muted mb-4" />
-              <h3 className="text-base font-semibold text-text-primary">No Reports Available</h3>
-              <p className="text-xs text-text-muted mt-2">Adjust search settings to query history.</p>
-            </div>
-          ) : (
-            <div className="border border-stadium-border rounded-md bg-bg-panel overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse" aria-label="Recent reports list table">
-                <thead>
-                  <tr className="border-b border-stadium-border bg-bg-secondary text-text-muted font-bold">
-                    <th className="p-3">Report ID</th>
-                    <th className="p-3">Name</th>
-                    <th className="p-3">Generated</th>
-                    <th className="p-3">Format</th>
-                    <th className="p-3 text-right">Status</th>
+        {reports.loading ? (
+          <div className="space-y-3 animate-pulse" aria-hidden="true">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="h-16 bg-bg-panel border border-stadium-border rounded" />
+            ))}
+          </div>
+        ) : filteredReports?.length === 0 ? (
+          <div className="p-12 text-center bg-bg-panel border border-dashed border-stadium-border rounded flex flex-col items-center justify-center">
+            <Inbox className="w-12 h-12 text-text-muted mb-4" />
+            <h3 className="text-base font-semibold text-text-primary">No Reports Available</h3>
+            <p className="text-xs text-text-muted mt-2">Adjust search settings to query history.</p>
+          </div>
+        ) : (
+          <div className="border border-stadium-border rounded-md bg-bg-panel overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse" aria-label="Recent reports list table">
+              <thead>
+                <tr className="border-b border-stadium-border bg-bg-secondary text-text-muted font-bold">
+                  <th className="p-3">Report ID</th>
+                  <th className="p-3">Name</th>
+                  <th className="p-3">Generated</th>
+                  <th className="p-3">Format</th>
+                  <th className="p-3 text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stadium-border text-text-secondary">
+                {filteredReports?.map((rep: Report) => (
+                  <tr key={rep.id} className="hover:bg-bg-secondary/40 transition-colors">
+                    <td className="p-3 font-mono font-bold text-text-muted">{rep.id}</td>
+                    <td className="p-3 font-semibold text-text-primary">{rep.title}</td>
+                    <td className="p-3">{new Date(rep.generatedAt).toLocaleDateString()}</td>
+                    <td className="p-3">
+                      <Badge variant="neutral">{rep.format}</Badge>
+                    </td>
+                    <td className="p-3 text-right">
+                      <Badge variant={rep.status === 'Completed' ? 'success' : 'warning'}>
+                        {rep.status}
+                      </Badge>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-stadium-border text-text-secondary">
-                  {filteredReports?.map((rep: Report) => (
-                    <tr key={rep.id} className="hover:bg-bg-secondary/40 transition-colors">
-                      <td className="p-3 font-mono font-bold text-text-muted">{rep.id}</td>
-                      <td className="p-3 font-semibold text-text-primary">{rep.title}</td>
-                      <td className="p-3">{new Date(rep.generatedAt).toLocaleDateString()}</td>
-                      <td className="p-3">
-                        <Badge variant="neutral">{rep.format}</Badge>
-                      </td>
-                      <td className="p-3 text-right">
-                        <Badge variant={rep.status === 'Completed' ? 'success' : 'warning'}>
-                          {rep.status}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT COLUMN: EXPORTS */}
-        <div className="space-y-6">
-          <Card className="bg-bg-panel p-4 space-y-3">
-            <h3 className="text-xs font-bold text-text-primary uppercase tracking-wide">Export Telemetry Center</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const content = "StadiumOps AI Report PDF Export Simulation\n=========================================\nReport ID: REP-104\nTitle: Match Day Summary Log\nStatus: Verified.";
-                  const blob = new Blob([content], { type: 'application/pdf' });
-                  const url = URL.createObjectURL(blob);
-                  const link = document.createElement('a');
-                  link.href = url;
-                  link.download = `stadiumops_report_${Date.now()}.pdf`;
-                  link.click();
-                  URL.revokeObjectURL(url);
-                  pushToast('Download Complete', 'PDF report downloaded successfully.', 'success');
-                }}
-                className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-start"
-              >
-                Download PDF
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const content = "Report ID,Name,Generated Date,Format,Status\nREP-101,Weather Ingress Audit,2026-07-16,CSV,Completed";
-                  const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
-                  const url = URL.createObjectURL(blob);
-                  const link = document.createElement('a');
-                  link.href = url;
-                  link.download = `stadiumops_report_${Date.now()}.csv`;
-                  link.click();
-                  URL.revokeObjectURL(url);
-                  pushToast('Export Complete', 'CSV report downloaded successfully.', 'success');
-                }}
-                className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-start"
-              >
-                Export CSV
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  window.print();
-                  pushToast('Print Command Sent', 'Opening browser print dialogue.', 'info');
-                }}
-                className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5 justify-start col-span-2"
-              >
-                <Printer className="w-3.5 h-3.5 mr-1" /> Print Log
-              </Button>
-            </div>
-          </Card>
-        </div>
-
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* SECTION 7: ANALYTICS PREVIEW AI */}

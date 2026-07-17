@@ -82,10 +82,10 @@ export default function IncidentsPage(): React.JSX.Element {
 
         <div className="flex items-center gap-2">
           <Button variant="danger" size="sm" className="font-semibold" onClick={handleLogNewIncident}>
-            <Plus className="w-4 h-4 mr-1.5" /> Log New Incident
+            <Plus className="w-5 h-5 mr-2" /> Log New Incident
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-4 h-4 ${list.loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${list.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
@@ -98,9 +98,9 @@ export default function IncidentsPage(): React.JSX.Element {
             type="search"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
-            placeholder="Search incident title, description, ID..."
+            placeholder="Search incident reports..."
             className="w-full bg-bg-secondary text-text-primary text-xs pl-10 pr-4 py-2 border border-stadium-border rounded focus:outline-none focus:ring-2 focus:ring-stadium-accent placeholder:text-text-muted"
-            aria-label="Filter incidents log"
+            aria-label="Filter incidents list"
           />
         </div>
 
@@ -122,25 +122,25 @@ export default function IncidentsPage(): React.JSX.Element {
             className="bg-bg-secondary text-text-primary text-xs px-3 py-2 border border-stadium-border rounded cursor-pointer"
           >
             <option value="">Severity: All</option>
-            {Object.values(IncidentSeverity).map((sev) => (
-              <option key={sev} value={sev}>{sev}</option>
+            {Object.values(IncidentSeverity).map((severity) => (
+              <option key={severity} value={severity}>{severity}</option>
             ))}
           </select>
         </div>
       </form>
 
       {/* SPLIT MAIN SECTION */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
         
-        {/* LEFT COLUMN: LIST */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* LEFT COLUMN: LIST (65% width) */}
+        <div className="w-full lg:w-[65%] space-y-4">
           <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Active Incident Queue</h2>
 
           {list.loading ? (
             <div className="space-y-3 animate-pulse" aria-busy="true">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className="h-28 bg-bg-panel border border-stadium-border rounded-md" />
-              ))}
+              <div className="h-10 bg-bg-panel border border-stadium-border rounded" />
+              <div className="h-10 bg-bg-panel border border-stadium-border rounded" />
+              <div className="h-10 bg-bg-panel border border-stadium-border rounded" />
             </div>
           ) : list.data?.length === 0 ? (
             <div className="p-12 text-center bg-bg-panel border border-dashed border-stadium-border rounded-md flex flex-col items-center justify-center">
@@ -149,47 +149,60 @@ export default function IncidentsPage(): React.JSX.Element {
               <p className="text-xs text-text-muted mt-2">Create new incident records or adjust search parameters.</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-[650px] overflow-y-auto pr-1">
-              {list.data?.map((inc: Incident) => {
-                const isSelected = selected?.id === inc.id;
-                return (
-                  <div
-                    key={inc.id}
-                    onClick={() => selectIncident(inc)}
-                    className={`p-4 bg-bg-panel border rounded-md cursor-pointer transition-all hover:border-stadium-accent ${
-                      isSelected ? 'border-stadium-accent ring-1 ring-stadium-accent' : 'border-stadium-border'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono text-text-muted">{inc.id}</span>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={severityMap[inc.severity]}>{inc.severity}</Badge>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-bg-secondary text-text-secondary uppercase">
-                          {inc.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    <h3 className="text-sm font-bold text-text-primary mt-2">{inc.title}</h3>
-                    <p className="text-xs text-text-secondary mt-1 line-clamp-2 leading-relaxed">{inc.description}</p>
-
-                    <div className="flex items-center justify-between mt-3 text-xs text-text-muted border-t border-stadium-border/40 pt-2.5">
-                      <span>Zone: <strong className="text-text-secondary">{inc.zoneId}</strong></span>
-                      <span>{new Date(inc.reportedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="bg-[#14171d] border border-white/[0.04] rounded-xl overflow-hidden shadow-subtle">
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-stadium-border bg-[#0a0b0d]/60 text-[10px] font-bold text-text-muted uppercase tracking-wider sticky top-0 z-10">
+                      <th className="py-2.5 px-3">ID</th>
+                      <th className="py-2.5 px-3">Severity</th>
+                      <th className="py-2.5 px-3">Incident Title</th>
+                      <th className="py-2.5 px-3">Zone</th>
+                      <th className="py-2.5 px-3">Timestamp</th>
+                      <th className="py-2.5 px-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-xs divide-y divide-white/[0.02]">
+                    {list.data?.map((inc: Incident) => {
+                      const isSelected = selected?.id === inc.id;
+                      return (
+                        <tr
+                          key={inc.id}
+                          onClick={() => selectIncident(inc)}
+                          className={`cursor-pointer hover:bg-white/[0.02] transition-colors ${
+                            isSelected ? 'bg-stadium-accent/10 border-l-2 border-stadium-accent' : ''
+                          }`}
+                        >
+                          <td className="py-2 px-3 font-mono font-bold text-text-muted">{inc.id}</td>
+                          <td className="py-2 px-3">
+                            <Badge variant={severityMap[inc.severity]}>{inc.severity}</Badge>
+                          </td>
+                          <td className="py-2 px-3 font-bold text-text-primary">{inc.title}</td>
+                          <td className="py-2 px-3 text-text-secondary">{inc.zoneId}</td>
+                          <td className="py-2 px-3 text-text-muted">
+                            {new Date(inc.reportedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td className="py-2 px-3">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-bg-secondary text-text-secondary uppercase">
+                              {inc.status}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
 
-        {/* RIGHT COLUMN: DETAILS */}
-        <div className="space-y-4">
+        {/* RIGHT COLUMN: DETAILS (35% width) */}
+        <div className="w-full lg:w-[35%] space-y-4">
           <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Incident Details HUD</h2>
 
           {selected ? (
-            <Card className="bg-bg-panel text-xs text-text-secondary space-y-4">
+            <Card className="bg-bg-panel text-xs text-text-secondary space-y-4 p-5 border border-stadium-border">
               <div className="flex items-center justify-between border-b border-stadium-border pb-4">
                 <div>
                   <h3 className="text-sm font-bold text-text-primary leading-tight">{selected.title}</h3>
@@ -321,7 +334,7 @@ export default function IncidentsPage(): React.JSX.Element {
               </div>
             </Card>
           ) : (
-            <Card className="bg-bg-panel p-6 text-center text-text-muted">
+            <Card className="bg-bg-panel p-6 text-center text-text-muted border border-stadium-border">
               Select an incident from the queue to view detailed diagnostics logs.
             </Card>
           )}

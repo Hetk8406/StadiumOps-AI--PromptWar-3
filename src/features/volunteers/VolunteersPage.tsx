@@ -83,10 +83,10 @@ export default function VolunteersPage(): React.JSX.Element {
 
         <div className="flex items-center gap-2">
           <Button variant="primary" size="sm" className="font-semibold" onClick={handleRegisterVolunteer}>
-            <Plus className="w-4 h-4 mr-1.5" /> Register Volunteer
+            <Plus className="w-5 h-5 mr-2" /> Register Volunteer
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-4 h-4 ${list.loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${list.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
@@ -131,17 +131,17 @@ export default function VolunteersPage(): React.JSX.Element {
       </form>
 
       {/* MAIN LAYOUT SPLIT */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
         
-        {/* LEFT COLUMN: LIST */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* LEFT COLUMN: LIST (65% width) */}
+        <div className="w-full lg:w-[65%] space-y-4">
           <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">On-Duty Volunteers</h2>
 
           {list.loading ? (
             <div className="space-y-3 animate-pulse" aria-busy="true">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className="h-24 bg-bg-panel border border-stadium-border rounded" />
-              ))}
+              <div className="h-10 bg-bg-panel border border-stadium-border rounded" />
+              <div className="h-10 bg-bg-panel border border-stadium-border rounded" />
+              <div className="h-10 bg-bg-panel border border-stadium-border rounded" />
             </div>
           ) : list.data?.length === 0 ? (
             <div className="p-12 text-center bg-bg-panel border border-dashed border-stadium-border rounded flex flex-col items-center justify-center">
@@ -150,28 +150,29 @@ export default function VolunteersPage(): React.JSX.Element {
               <p className="text-xs text-text-muted mt-2">Adjust filters or search parameters.</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-[650px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[650px] overflow-y-auto pr-1">
               {list.data?.map((v: Volunteer) => {
                 const isSelected = selected?.id === v.id;
                 return (
                   <div
                     key={v.id}
                     onClick={() => selectVolunteer(v)}
-                    className={`p-4 bg-bg-panel border rounded transition-all hover:border-stadium-accent cursor-pointer flex items-center justify-between ${
-                      isSelected ? 'border-stadium-accent ring-1 ring-stadium-accent' : 'border-stadium-border'
+                    className={`p-2.5 px-4 bg-[#14171d] border rounded transition-all hover:border-stadium-accent cursor-pointer flex items-center justify-between ${
+                      isSelected ? 'border-stadium-accent ring-1 ring-stadium-accent bg-stadium-accent/5' : 'border-white/[0.04]'
                     }`}
                   >
                     <div>
                       <div className="flex items-center space-x-2">
-                        <strong className="text-sm text-text-primary">{v.firstName} {v.lastName}</strong>
-                        <span className="text-[10px] font-mono text-text-muted">({v.id})</span>
+                        <strong className="text-xs text-text-primary font-bold">{v.firstName} {v.lastName}</strong>
+                        <span className="text-[9px] font-mono text-text-muted">({v.id})</span>
+                        <span className="text-[10px] text-text-muted">| {v.role}</span>
                       </div>
-                      <p className="text-xs text-text-secondary mt-1">Role: <strong className="text-text-primary">{v.role}</strong> | Zone: {v.currentZone}</p>
+                      <p className="text-[10px] text-text-secondary mt-0.5">Zone: <strong className="text-text-primary">{v.currentZone}</strong></p>
                     </div>
 
-                    <div className="flex flex-col items-end gap-1.5">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-[9.5px] text-text-muted font-semibold">Exp: {v.experienceLevel}</span>
                       <Badge variant={statusColors[v.status]}>{v.status}</Badge>
-                      <span className="text-[10px] text-text-muted">Exp: {v.experienceLevel}</span>
                     </div>
                   </div>
                 );
@@ -180,12 +181,12 @@ export default function VolunteersPage(): React.JSX.Element {
           )}
         </div>
 
-        {/* RIGHT COLUMN: DETAILS */}
-        <div className="space-y-4">
+        {/* RIGHT COLUMN: DETAILS (35% width) */}
+        <div className="w-full lg:w-[35%] space-y-4">
           <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Volunteer Diagnostics HUD</h2>
 
           {selected ? (
-            <Card className="bg-bg-panel text-xs text-text-secondary space-y-4">
+            <Card className="bg-bg-panel text-xs text-text-secondary space-y-4 p-5 border border-stadium-border">
               <div className="flex items-center justify-between border-b border-stadium-border pb-4">
                 <div>
                   <h3 className="text-sm font-bold text-text-primary leading-tight">
@@ -327,7 +328,7 @@ export default function VolunteersPage(): React.JSX.Element {
               </div>
             </Card>
           ) : (
-            <Card className="bg-bg-panel p-6 text-center text-text-muted">
+            <Card className="bg-bg-panel p-6 text-center text-text-muted border border-stadium-border">
               Select a volunteer steward to inspect credentials and shift deployment diagnostics.
             </Card>
           )}

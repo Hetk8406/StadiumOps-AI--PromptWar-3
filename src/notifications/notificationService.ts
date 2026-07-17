@@ -46,6 +46,10 @@ export function pushNotification(
   module: NotificationModule,
   options?: { action?: AppNotification['action']; persistent?: boolean }
 ): void {
+  // Prevent duplicate notifications with the same title and message
+  if (notifications.some((n) => n.title === title && n.message === message)) {
+    return;
+  }
   const notif: AppNotification = {
     id: `notif-${++notifIdCounter}`,
     title,
@@ -79,6 +83,10 @@ export function pushToast(
   variant: ToastVariant,
   options?: { duration?: number; action?: Toast['action'] }
 ): void {
+  // Prevent duplicate toasts with the same title and message
+  if (toasts.some((t) => t.title === title && t.message === message)) {
+    return;
+  }
   const toast: Toast = {
     id: `toast-${++toastIdCounter}`,
     title,

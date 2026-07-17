@@ -47,7 +47,7 @@ const ToastItem = memo(function ToastItem({ toast }: ToastItemProps) {
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
-      className={`relative flex items-start gap-3 w-80 p-3 rounded-md border shadow-lg text-xs motion-toast-enter ${config.bg}`}
+      className={`relative flex items-start gap-3 w-80 p-3 rounded-md border shadow-lg text-xs motion-toast-enter pointer-events-auto ${config.bg}`}
     >
       {/* Severity bar */}
       <div className={`absolute left-0 top-0 bottom-0 w-0.5 rounded-l-md ${config.bar}`} aria-hidden="true" />
@@ -72,9 +72,9 @@ const ToastItem = memo(function ToastItem({ toast }: ToastItemProps) {
         type="button"
         onClick={() => dismissToast(toast.id)}
         aria-label="Dismiss notification"
-        className="text-text-muted hover:text-text-primary focus:outline-none focus:ring-1 focus:ring-stadium-accent rounded motion-focus-ring"
+        className="text-text-muted hover:text-text-primary focus:outline-none focus:ring-1 focus:ring-stadium-accent rounded motion-focus-ring p-0.5"
       >
-        <X className="w-3.5 h-3.5" />
+        <X className="w-5 h-5" />
       </button>
     </div>
   );
