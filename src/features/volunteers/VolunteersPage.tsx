@@ -51,10 +51,6 @@ export default function VolunteersPage(): React.JSX.Element {
     setSearchQuery(localSearch);
   };
 
-  const handleRefresh = () => {
-    fetchVolunteers(searchQuery, filterRole, filterStatus);
-  };
-
   const handleRegisterVolunteer = () => {
     const id = `VOL-${Math.floor(1000 + Math.random() * 9000)}`;
     pushToast(`New Volunteer Registered: ${id}`, 'Successfully added to active tournament roster database.', 'success');
@@ -84,9 +80,6 @@ export default function VolunteersPage(): React.JSX.Element {
         <div className="flex items-center gap-2">
           <Button variant="primary" size="sm" className="font-semibold" onClick={handleRegisterVolunteer}>
             <Plus className="w-5 h-5 mr-2" /> Register Volunteer
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-5 h-5 ${list.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>

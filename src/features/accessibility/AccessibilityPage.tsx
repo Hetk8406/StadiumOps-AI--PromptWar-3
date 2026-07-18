@@ -53,10 +53,6 @@ export default function AccessibilityPage(): React.JSX.Element {
     setSearchQuery(localSearch);
   };
 
-  const handleRefresh = () => {
-    fetchRequests(searchQuery, filterCategory, filterStatus);
-  };
-
   const priorityMap: Record<IncidentSeverity, 'danger' | 'warning' | 'info' | 'neutral'> = {
     [IncidentSeverity.CRITICAL]: 'danger',
     [IncidentSeverity.HIGH]: 'danger',
@@ -88,9 +84,6 @@ export default function AccessibilityPage(): React.JSX.Element {
             }}
           >
             <Plus className="w-5 h-5 mr-2" /> New Assistance Request
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-5 h-5 ${requests.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>

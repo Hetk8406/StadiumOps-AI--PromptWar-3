@@ -30,10 +30,6 @@ export default function CrowdPage(): React.JSX.Element {
     clearRecommendations();
   }, [clearRecommendations]);
 
-  const handleRefresh = () => {
-    fetchZonesAndGates();
-  };
-
   const handleSimulation = () => {
     setIsSimulating((prev) => {
       const next = !prev;
@@ -95,9 +91,6 @@ export default function CrowdPage(): React.JSX.Element {
           </Button>
           <Button variant="outline" size="sm" onClick={handleExportLogs} className="text-text-secondary">
             <Download className="w-5 h-5 mr-2" /> Export Logs
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-5 h-5 ${zones.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>

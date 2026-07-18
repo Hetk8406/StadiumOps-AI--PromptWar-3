@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  RefreshCw,
   Plus,
   Search,
   Inbox,
@@ -31,10 +30,6 @@ export default function ReportsPage(): React.JSX.Element {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(localSearch);
-  };
-
-  const handleRefresh = () => {
-    fetchReports(filterType);
   };
 
   const filteredReports = reports.data?.filter((rep: Report) =>
@@ -71,9 +66,6 @@ export default function ReportsPage(): React.JSX.Element {
             className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5"
           >
             Schedule Report
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-5 h-5 ${reports.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>

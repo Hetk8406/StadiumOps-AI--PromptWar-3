@@ -3,7 +3,6 @@ import {
   AlertOctagon,
   Radio,
   FileDown,
-  RefreshCw,
   Search,
   Plus,
   Sparkles,
@@ -41,10 +40,6 @@ export default function CommunicationsPage(): React.JSX.Element {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(localSearch);
-  };
-
-  const handleRefresh = () => {
-    fetchBroadcasts(searchQuery, filterPriority);
   };
 
   const handleTranslateSubmit = (e: React.FormEvent) => {
@@ -107,9 +102,6 @@ export default function CommunicationsPage(): React.JSX.Element {
             }}
           >
             <FileDown className="w-5 h-5 mr-2" /> Export Logs
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-5 h-5 ${broadcasts.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>

@@ -51,10 +51,6 @@ export default function IncidentsPage(): React.JSX.Element {
     setSearchQuery(localSearch);
   };
 
-  const handleRefresh = () => {
-    fetchIncidents(searchQuery, filterStatus, filterSeverity);
-  };
-
   const handleLogNewIncident = () => {
     const id = `INC-${Math.floor(100 + Math.random() * 900)}`;
     pushToast(`New Incident Logged: ${id}`, 'Security first responders notified. Incident details dispatched to on-duty marshals.', 'error');
@@ -83,9 +79,6 @@ export default function IncidentsPage(): React.JSX.Element {
         <div className="flex items-center gap-2">
           <Button variant="danger" size="sm" className="font-semibold" onClick={handleLogNewIncident}>
             <Plus className="w-5 h-5 mr-2" /> Log New Incident
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleRefresh} className="text-text-secondary">
-            <RefreshCw className={`w-5 h-5 ${list.loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
