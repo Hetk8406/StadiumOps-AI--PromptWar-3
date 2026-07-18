@@ -5,7 +5,6 @@ import { ROUTES } from '../../config/constants';
 import { Button } from '../ui/Button';
 import NotificationCenter from '../notifications/NotificationCenter';
 import { useNotifications } from '../../notifications/useNotifications';
-import { pushToast } from '../../notifications/notificationService';
 
 interface SidebarProps {
   isMobileOpen: boolean;
@@ -150,14 +149,17 @@ export default function Sidebar({
           } />
         </div>
 
-        {/* Profile */}
-        <button
-          onClick={() => pushToast('Operator Session Info', 'User: Chief of Tournament Operations (Role: ADMIN). Node ID: TO-1082.', 'info')}
-          className="text-[#9ca3af] hover:text-stadium-accent transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-stadium-accent rounded p-1"
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            `text-[#9ca3af] hover:text-stadium-accent transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-stadium-accent rounded p-1 ${
+              isActive ? 'text-stadium-accent' : ''
+            }`
+          }
           aria-label="User Profile"
         >
           <User className="w-5 h-5" />
-        </button>
+        </NavLink>
 
         {/* Settings */}
         <NavLink

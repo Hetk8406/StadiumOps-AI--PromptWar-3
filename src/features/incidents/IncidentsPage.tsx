@@ -6,6 +6,7 @@ import {
   Search,
   Inbox,
   Sparkles,
+  X,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -14,6 +15,7 @@ import { useIncidents, useIncidentAI } from '../../state';
 import { IncidentSeverity, IncidentStatus } from '../../domain/enums';
 import { Incident } from '../../domain/models';
 import { pushToast } from '../../notifications/notificationService';
+import { incidents } from '../../mocks/incidents/incidents';
 
 /**
  * Incident Monitoring Feature Page.
@@ -36,6 +38,13 @@ export default function IncidentsPage(): React.JSX.Element {
   const { analysis, analyzing, error: aiError, analyzeIncident, clearAnalysis } = useIncidentAI();
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
+  // Manual Log Incident modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newSeverity, setNewSeverity] = useState<IncidentSeverity>(IncidentSeverity.LOW);
+  const [newZone, setNewZone] = useState('North Stand');
+  const [newDescription, setNewDescription] = useState('');
+
   useEffect(() => {
     document.title = 'Incident Monitoring - StadiumOps AI';
     fetchIncidents(searchQuery, filterStatus, filterSeverity);
@@ -52,8 +61,72 @@ export default function IncidentsPage(): React.JSX.Element {
   };
 
   const handleLogNewIncident = () => {
-    const id = `INC-${Math.floor(100 + Math.random() * 900)}`;
-    pushToast(`New Incident Logged: ${id}`, 'Security first responders notified. Incident details dispatched to on-duty marshals.', 'error');
+    setIsModalOpen(true);
+  };
+
+  const updateIncidentStatus = (id: string, nextStatus: IncidentStatus) => {
+    const target = incidents.find(inc => inc.id === id);
+    if (target) {
+      target.status = nextStatus;
+      target.updatedAt = new Date().toISOString();
+      if (nextStatus === IncidentStatus.RESOLVED) {
+        target.resolvedAt = new Date().toISOString();
+      }
+    }
+    fetchIncidents(searchQuery, filterStatus, filterSeverity);
+    if (selected && selected.id === id) {
+      selectIncident({ ...selected, status: nextStatus });
+    }
+  };
+
+  const handleSubmitIncident = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim() || !newDescription.trim()) return;
+
+    // Numerical ordered ID generation
+    let maxNum = 129; // default baseline in mocks
+    incidents.forEach(inc => {
+      const match = inc.id.match(/\d+$/);
+      if (match) {
+        const num = parseInt(match[0], 10);
+        if (num > maxNum) {
+          maxNum = num;
+        }
+      }
+    });
+    const id = `INC-2026-${maxNum + 1}`;
+    
+    const newIncident: Incident = {
+      id,
+      title: newTitle,
+      description: newDescription,
+      severity: newSeverity,
+      status: IncidentStatus.OPEN,
+      zoneId: newZone,
+      reportedBy: 'Profile User',
+      reportedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      estimatedResponseTime: newSeverity === IncidentSeverity.CRITICAL ? '2 min' : '8 min',
+      notes: ['Incident manually logged by profile operator.'],
+      attachments: [],
+    };
+
+    incidents.unshift(newIncident);
+    fetchIncidents(searchQuery, filterStatus, filterSeverity);
+    selectIncident(newIncident);
+
+    // Reset Form
+    setNewTitle('');
+    setNewDescription('');
+    setNewSeverity(IncidentSeverity.LOW);
+    setNewZone('North Stand');
+    setIsModalOpen(false);
+
+    pushToast(
+      `New Incident Logged: ${id}`,
+      'Security first responders notified. Incident details dispatched to on-duty marshals.',
+      'success'
+    );
   };
 
   const severityMap: Record<IncidentSeverity, 'danger' | 'warning' | 'info' | 'neutral'> = {
@@ -156,7 +229,10 @@ export default function IncidentsPage(): React.JSX.Element {
                     </tr>
                   </thead>
                   <tbody className="text-xs divide-y divide-white/[0.02]">
-                    {list.data?.map((inc: Incident) => {
+                    {list.data
+                      ?.slice()
+                      .sort((a, b) => new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime())
+                      .map((inc: Incident) => {
                       const isSelected = selected?.id === inc.id;
                       return (
                         <tr
@@ -214,8 +290,16 @@ export default function IncidentsPage(): React.JSX.Element {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="block font-semibold text-text-muted uppercase tracking-wider mb-0.5">Status</span>
-                    <span className="text-text-primary font-medium">{selected.status}</span>
+                    <span className="block font-semibold text-text-muted uppercase tracking-wider mb-1">Status</span>
+                    <select
+                      value={selected.status}
+                      onChange={(e) => updateIncidentStatus(selected.id, e.target.value as IncidentStatus)}
+                      className="bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer font-bold uppercase tracking-wider"
+                    >
+                      {Object.values(IncidentStatus).map((status) => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <span className="block font-semibold text-text-muted uppercase tracking-wider mb-0.5">Reporting Zone</span>
@@ -309,7 +393,10 @@ export default function IncidentsPage(): React.JSX.Element {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => pushToast('Squad Dispatched', `Coordinated response team dispatched to ${selected.zoneId} for ${selected.id}.`, 'success')}
+                      onClick={() => {
+                        updateIncidentStatus(selected.id, IncidentStatus.ASSIGNED);
+                        pushToast('Squad Dispatched', `Coordinated response team dispatched to ${selected.zoneId} for ${selected.id}.`, 'success');
+                      }}
                       className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5"
                     >
                       Dispatch Squad
@@ -317,7 +404,10 @@ export default function IncidentsPage(): React.JSX.Element {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => pushToast('Incident Resolved', `Incident ${selected.id} has been marked as RESOLVED in the command center database.`, 'info')}
+                      onClick={() => {
+                        updateIncidentStatus(selected.id, IncidentStatus.RESOLVED);
+                        pushToast('Incident Resolved', `Incident ${selected.id} has been marked as RESOLVED in the command center database.`, 'info');
+                      }}
                       className="text-text-primary border-stadium-success/50 hover:bg-stadium-success/5"
                     >
                       Resolve Incident
@@ -334,6 +424,92 @@ export default function IncidentsPage(): React.JSX.Element {
         </div>
 
       </div>
+
+      {/* 2. MANUAL LOG INCIDENT OVERLAY MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#14171d] border border-white/[0.08] rounded-xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-stadium-border pb-3">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Log New Incident</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-text-muted hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitIncident} className="space-y-4 text-xs text-text-secondary">
+              <div className="space-y-1">
+                <label className="block text-text-muted font-bold uppercase tracking-wider">Incident Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="e.g. Crowded Turnstiles, Power Outage, Fan Injury"
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-text-muted font-bold uppercase tracking-wider">Severity</label>
+                <select
+                  value={newSeverity}
+                  onChange={(e) => setNewSeverity(e.target.value as IncidentSeverity)}
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer"
+                >
+                  {Object.values(IncidentSeverity).map((sev) => (
+                    <option key={sev} value={sev}>{sev}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-text-muted font-bold uppercase tracking-wider">Zone</label>
+                <select
+                  value={newZone}
+                  onChange={(e) => setNewZone(e.target.value)}
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer"
+                >
+                  {['North Stand', 'South Stand', 'East Stand', 'West Stand', 'VIP Area', 'Parking Zone A', 'Fan Zone B'].map((zone) => (
+                    <option key={zone} value={zone}>{zone}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-text-muted font-bold uppercase tracking-wider">Incident Description / Details</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  placeholder="Provide precise details of the incident, people involved, or location references."
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsModalOpen(false)}
+                  className="font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  className="bg-stadium-accent hover:bg-blue-700 text-white font-bold uppercase tracking-wider"
+                >
+                  Log Incident
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

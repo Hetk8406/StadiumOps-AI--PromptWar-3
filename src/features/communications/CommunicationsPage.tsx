@@ -9,14 +9,16 @@ import {
   Inbox,
   Volume2,
   Smartphone,
+  X,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { useCommunications, useTranslationAI } from '../../state';
-import { BroadcastPriority } from '../../domain/enums';
+import { BroadcastPriority, BroadcastStatus } from '../../domain/enums';
 import { Broadcast } from '../../domain/models';
 import { pushToast } from '../../notifications/notificationService';
+import { communications } from '../../mocks/communications/communications';
 
 /**
  * Communications Center Feature Page.
@@ -26,6 +28,109 @@ export default function CommunicationsPage(): React.JSX.Element {
   const { broadcasts, searchQuery, filterPriority, fetchBroadcasts, setSearchQuery, setPriorityFilter } = useCommunications();
   const { loading: translating, result: aiResult, error: aiError, translateMessage, clearTranslation } = useTranslationAI();
   const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  // Broadcast and Emergency alert states
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+  const [newBcTitle, setNewBcTitle] = useState('');
+  const [newBcMessage, setNewBcMessage] = useState('');
+  const [newBcPriority, setNewBcPriority] = useState<BroadcastPriority>(BroadcastPriority.LOW);
+  const [newBcAudience, setNewBcAudience] = useState('All Visitors');
+
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
+  const [newEmMessage, setNewEmMessage] = useState('');
+
+  const handleCreateBroadcast = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBcTitle.trim() || !newBcMessage.trim()) return;
+
+    let maxNum = 144;
+    communications.forEach(bc => {
+      const match = bc.id.match(/\d+$/);
+      if (match) {
+        const num = parseInt(match[0], 10);
+        if (num > maxNum) maxNum = num;
+      }
+    });
+    const id = `BC-2026-${maxNum + 1}`;
+
+    const newBroadcast: Broadcast = {
+      id,
+      title: newBcTitle,
+      message: newBcMessage,
+      priority: newBcPriority,
+      audience: newBcAudience,
+      languages: ['en'],
+      status: BroadcastStatus.SENT,
+      createdAt: new Date().toISOString(),
+      publishedAt: new Date().toISOString(),
+    };
+
+    communications.unshift(newBroadcast);
+    fetchBroadcasts(searchQuery, filterPriority);
+
+    setNewBcTitle('');
+    setNewBcMessage('');
+    setNewBcPriority(BroadcastPriority.LOW);
+    setNewBcAudience('All Visitors');
+    setIsBroadcastModalOpen(false);
+
+    pushToast('New Broadcast Dispatch', `Broadcast message ${id} has been transmitted to all channels.`, 'success');
+  };
+
+  const handleCreateEmergency = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmMessage.trim()) return;
+
+    let maxNum = 144;
+    communications.forEach(bc => {
+      const match = bc.id.match(/\d+$/);
+      if (match) {
+        const num = parseInt(match[0], 10);
+        if (num > maxNum) maxNum = num;
+      }
+    });
+    const id = `BC-2026-${maxNum + 1}`;
+
+    const newBroadcast: Broadcast = {
+      id,
+      title: 'CRITICAL EMERGENCY WARNING',
+      message: newEmMessage,
+      priority: BroadcastPriority.CRITICAL,
+      audience: 'All Visitors',
+      languages: ['en', 'es', 'fr', 'pt', 'ar'],
+      status: BroadcastStatus.DELIVERED,
+      createdAt: new Date().toISOString(),
+      publishedAt: new Date().toISOString(),
+    };
+
+    communications.unshift(newBroadcast);
+    fetchBroadcasts(searchQuery, filterPriority);
+
+    setNewEmMessage('');
+    setIsEmergencyModalOpen(false);
+
+    pushToast('Emergency Overlay Live', `Direct critical warning ${id} broadcasted via evacuation system.`, 'error');
+  };
+
+  const [selectedBroadcast, setSelectedBroadcast] = useState<Broadcast | null>(null);
+
+  const updateBroadcastStatus = (id: string, nextStatus: BroadcastStatus) => {
+    const target = communications.find(c => c.id === id);
+    if (target) {
+      target.status = nextStatus;
+      if (nextStatus === BroadcastStatus.SENT || nextStatus === BroadcastStatus.DELIVERED) {
+        target.publishedAt = new Date().toISOString();
+      }
+    }
+    fetchBroadcasts(searchQuery, filterPriority);
+    if (selectedBroadcast && selectedBroadcast.id === id) {
+      setSelectedBroadcast({
+        ...selectedBroadcast,
+        status: nextStatus,
+        publishedAt: nextStatus === BroadcastStatus.SENT || nextStatus === BroadcastStatus.DELIVERED ? new Date().toISOString() : selectedBroadcast.publishedAt
+      });
+    }
+  };
 
   // AI Translation form state
   const [inputText, setInputText] = useState('');
@@ -73,7 +178,7 @@ export default function CommunicationsPage(): React.JSX.Element {
             variant="primary"
             size="sm"
             className="font-semibold"
-            onClick={() => pushToast('New Broadcast Triggered', 'Opening announcement broadcasting screen configuration.', 'success')}
+            onClick={() => setIsBroadcastModalOpen(true)}
           >
             <Plus className="w-5 h-5 mr-2" /> New Broadcast
           </Button>
@@ -81,7 +186,7 @@ export default function CommunicationsPage(): React.JSX.Element {
             variant="danger"
             size="sm"
             className="font-semibold"
-            onClick={() => pushToast('Emergency Alert Broadcasted', 'Direct voice and visual evacuation overlays dispatched to all stadium sectors.', 'error')}
+            onClick={() => setIsEmergencyModalOpen(true)}
           >
             <AlertOctagon className="w-5 h-5 mr-2" /> Emergency Alert
           </Button>
@@ -177,77 +282,150 @@ export default function CommunicationsPage(): React.JSX.Element {
               <p className="text-xs text-text-muted mt-2">Adjust search settings to look up old logs.</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-              {broadcasts.data?.map((bc: Broadcast) => (
-                <div key={bc.id} className="p-4 bg-bg-panel border border-stadium-border rounded-xl hover:border-stadium-accent transition-all">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-text-muted">{bc.id}</span>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant={priorityColors[bc.priority]}>{bc.priority}</Badge>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-bg-secondary text-text-secondary uppercase">
-                        {bc.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  <h3 className="text-sm font-bold text-text-primary mt-2">{bc.title}</h3>
-                  <p className="text-xs text-text-secondary mt-1 leading-relaxed bg-bg-secondary p-2.5 rounded border border-stadium-border/40">
-                    {bc.message}
-                  </p>
-
-                  <div className="flex flex-wrap items-center justify-between mt-3 text-xs text-text-muted">
-                    <span>Target: <strong className="text-text-secondary">{bc.audience}</strong></span>
-                    <span>Sent: {new Date(bc.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-[#14171d] border border-white/[0.04] rounded-xl overflow-hidden shadow-subtle">
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-stadium-border bg-[#0a0b0d]/60 text-[10px] font-bold text-text-muted uppercase tracking-wider sticky top-0 z-10">
+                      <th className="py-2.5 px-3">ID</th>
+                      <th className="py-2.5 px-3">Title & Audience</th>
+                      <th className="py-2.5 px-3">Message</th>
+                      <th className="py-2.5 px-3">Priority</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3">Sent</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-xs divide-y divide-white/[0.02]">
+                    {broadcasts.data
+                      ?.slice()
+                      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                      .map((bc: Broadcast) => {
+                        return (
+                          <tr
+                            key={bc.id}
+                            onClick={() => setSelectedBroadcast(bc)}
+                            className={`cursor-pointer hover:bg-white/[0.02] transition-colors ${
+                              selectedBroadcast?.id === bc.id ? 'bg-stadium-accent/10 border-l-2 border-stadium-accent' : ''
+                            }`}
+                          >
+                            <td className="py-2 px-3 font-mono font-bold text-text-muted">{bc.id}</td>
+                            <td className="py-2 px-3 font-bold text-text-primary">
+                              {bc.title}
+                              <span className="text-[10px] text-text-muted font-normal block">Audience: {bc.audience}</span>
+                            </td>
+                            <td className="py-2 px-3 text-text-secondary max-w-[250px] truncate" title={bc.message}>
+                              {bc.message}
+                            </td>
+                            <td className="py-2 px-3">
+                              <Badge variant={priorityColors[bc.priority]}>{bc.priority}</Badge>
+                            </td>
+                            <td className="py-2 px-3">
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-bg-secondary text-text-secondary uppercase">
+                                {bc.status}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3 text-text-muted font-mono">
+                              {new Date(bc.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Right Column (30% width): Reusable Templates */}
+        {/* Right Column (30% width): Broadcast Details HUD */}
         <div className="w-full lg:w-[30%] space-y-4">
-          <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Quick Templates Selection</h2>
+          <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Broadcast Details HUD</h2>
           
-          <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-            <Card className="bg-bg-panel p-4 space-y-2 border border-stadium-border rounded-xl">
-              <div className="flex justify-between items-center">
-                <strong className="text-text-primary text-xs uppercase tracking-wide">Emergency Evacuation</strong>
-                <Badge variant="danger">Critical</Badge>
+          {selectedBroadcast ? (
+            <Card className="bg-bg-panel text-xs text-text-secondary space-y-4 p-5 border border-stadium-border rounded-xl">
+              <div className="flex items-center justify-between border-b border-stadium-border pb-4">
+                <div>
+                  <h3 className="text-sm font-bold text-text-primary leading-tight">{selectedBroadcast.title}</h3>
+                  <span className="text-[10px] font-mono text-text-muted block mt-1">{selectedBroadcast.id}</span>
+                </div>
+                <Badge variant={priorityColors[selectedBroadcast.priority]}>{selectedBroadcast.priority}</Badge>
               </div>
-              <p className="text-xs text-text-muted leading-relaxed">Directs crowd flow to emergency safety gates immediately.</p>
-              <Button
-                variant="danger"
-                size="sm"
-                className="w-full font-semibold uppercase tracking-wider text-[11px]"
-                onClick={() => {
-                  setInputText("CRITICAL ALERT: Emergency evacuation protocols activated. Please proceed to the nearest exit gates in an orderly fashion.");
-                  pushToast("Template Selected", "Evacuation alert text loaded into translation editor.", "info");
-                }}
-              >
-                Use Template
-              </Button>
-            </Card>
 
-            <Card className="bg-bg-panel p-4 space-y-2 border border-stadium-border rounded-xl">
-              <div className="flex justify-between items-center">
-                <strong className="text-text-primary text-xs uppercase tracking-wide">Medical Call Assist</strong>
-                <Badge variant="warning">High</Badge>
+              <div className="space-y-4">
+                <div>
+                  <span className="block font-semibold text-text-muted uppercase tracking-wider mb-1">Message Body</span>
+                  <p className="leading-relaxed bg-bg-secondary p-3 border border-stadium-border rounded text-text-secondary">
+                    {selectedBroadcast.message}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="block font-semibold text-text-muted uppercase tracking-wider mb-1">Status</span>
+                    <select
+                      value={selectedBroadcast.status}
+                      onChange={(e) => updateBroadcastStatus(selectedBroadcast.id, e.target.value as BroadcastStatus)}
+                      className="bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer font-bold uppercase tracking-wider w-full"
+                    >
+                      {Object.values(BroadcastStatus).map((status) => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <span className="block font-semibold text-text-muted uppercase tracking-wider mb-0.5">Target Audience</span>
+                    <span className="text-text-primary font-medium">{selectedBroadcast.audience}</span>
+                  </div>
+                  <div>
+                    <span className="block font-semibold text-text-muted uppercase tracking-wider mb-0.5">Created At</span>
+                    <span className="text-text-primary font-medium font-mono">
+                      {new Date(selectedBroadcast.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block font-semibold text-text-muted uppercase tracking-wider mb-0.5">Published At</span>
+                    <span className="text-text-primary font-medium font-mono">
+                      {selectedBroadcast.publishedAt
+                        ? new Date(selectedBroadcast.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-t border-stadium-border pt-4 space-y-2">
+                  <span className="block font-semibold text-text-muted uppercase tracking-wider">Quick Actions</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        updateBroadcastStatus(selectedBroadcast.id, BroadcastStatus.SENT);
+                        pushToast('Broadcast Transmitted', `Broadcast ${selectedBroadcast.id} status updated to SENT.`, 'success');
+                      }}
+                      className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5"
+                    >
+                      Send Now
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        updateBroadcastStatus(selectedBroadcast.id, BroadcastStatus.DRAFT);
+                        pushToast('Broadcast Drafted', `Broadcast ${selectedBroadcast.id} status updated to DRAFT.`, 'info');
+                      }}
+                      className="text-text-primary border-white/[0.08] hover:bg-white/[0.02]"
+                    >
+                      Draft Mode
+                    </Button>
+                  </div>
+                </div>
               </div>
-              <p className="text-xs text-text-muted leading-relaxed">Requesting immediate medical unit details dispatch.</p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-text-primary text-[11px] border-stadium-warning/50 hover:bg-stadium-warning/5"
-                onClick={() => {
-                  setInputText("ATTENTION: Medical first responders are requested at sector concourse. Standby medical units activated.");
-                  pushToast("Template Selected", "Medical assist alert text loaded into translation editor.", "info");
-                }}
-              >
-                Use Template
-              </Button>
             </Card>
-          </div>
+          ) : (
+            <Card className="bg-bg-panel p-6 text-center text-text-muted border border-stadium-border rounded-xl">
+              Select a broadcast from the queue to view detailed metrics and trigger quick dispatch controls.
+            </Card>
+          )}
         </div>
 
       </div>
@@ -402,6 +580,143 @@ export default function CommunicationsPage(): React.JSX.Element {
           </Card>
         </div>
       </div>
+
+      {/* 2. NEW BROADCAST OVERLAY MODAL */}
+      {isBroadcastModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#14171d] border border-white/[0.08] rounded-xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-stadium-border pb-3">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Compose New Broadcast</h3>
+              <button onClick={() => setIsBroadcastModalOpen(false)} className="text-text-muted hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreateBroadcast} className="space-y-4 text-xs text-text-secondary">
+              <div className="space-y-1">
+                <label className="block text-text-muted font-bold uppercase tracking-wider">Broadcast Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newBcTitle}
+                  onChange={(e) => setNewBcTitle(e.target.value)}
+                  placeholder="e.g. Traffic Congestion Advisory"
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="block text-text-muted font-bold uppercase tracking-wider">Priority</label>
+                  <select
+                    value={newBcPriority}
+                    onChange={(e) => setNewBcPriority(e.target.value as BroadcastPriority)}
+                    className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer"
+                  >
+                    {Object.values(BroadcastPriority).map((pri) => (
+                      <option key={pri} value={pri}>{pri}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-text-muted font-bold uppercase tracking-wider">Target Audience</label>
+                  <select
+                    value={newBcAudience}
+                    onChange={(e) => setNewBcAudience(e.target.value)}
+                    className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer"
+                  >
+                    {['All Visitors', 'All Stewards', 'Medical Personnel', 'Public Fan Zone', 'Transit Commuters', 'Volunteer Teams'].map((aud) => (
+                      <option key={aud} value={aud}>{aud}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-text-muted font-bold uppercase tracking-wider">Announcement Message</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={newBcMessage}
+                  onChange={(e) => setNewBcMessage(e.target.value)}
+                  placeholder="Write the announcement message details to broadcast..."
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsBroadcastModalOpen(false)}
+                  className="font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  className="bg-stadium-accent hover:bg-blue-700 text-white font-bold uppercase tracking-wider"
+                >
+                  Transmit
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 3. EMERGENCY ALERT OVERLAY MODAL */}
+      {isEmergencyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#1c1214] border border-stadium-critical/30 rounded-xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-stadium-critical/20 pb-3">
+              <h3 className="text-sm font-bold text-stadium-critical uppercase tracking-wider flex items-center gap-2">
+                <AlertOctagon className="w-5 h-5 text-stadium-critical" /> CRITICAL EMERGENCY TRIGGER
+              </h3>
+              <button onClick={() => setIsEmergencyModalOpen(false)} className="text-text-muted hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreateEmergency} className="space-y-4 text-xs text-text-secondary">
+              <div className="space-y-1">
+                <label className="block text-stadium-critical font-bold uppercase tracking-wider">Evacuation / Safety Message</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={newEmMessage}
+                  onChange={(e) => setNewEmMessage(e.target.value)}
+                  placeholder="e.g. CRITICAL ALERT: Emergency evacuation protocols activated. Proceed to the nearest exit gates immediately."
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-critical/40 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-critical resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEmergencyModalOpen(false)}
+                  className="font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="danger"
+                  size="sm"
+                  className="bg-stadium-critical hover:bg-red-700 text-white font-bold uppercase tracking-wider"
+                >
+                  Broadcast Evacuation
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

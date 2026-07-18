@@ -6,6 +6,7 @@ import {
   Inbox,
   Star,
   Sparkles,
+  X,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -14,6 +15,7 @@ import { useVolunteers, useVolunteerAI } from '../../state';
 import { VolunteerRole, VolunteerStatus } from '../../domain/enums';
 import { Volunteer } from '../../domain/models';
 import { pushToast } from '../../notifications/notificationService';
+import { volunteers } from '../../mocks/volunteers/volunteers';
 
 /**
  * Volunteer Roster Deployment Module View.
@@ -36,6 +38,15 @@ export default function VolunteersPage(): React.JSX.Element {
   const { recommendations, analyzing, error: aiError, recommendAssignments, clearRecommendations } = useVolunteerAI();
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
+  // Register Volunteer modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newFirstName, setNewFirstName] = useState('');
+  const [newLastName, setNewLastName] = useState('');
+  const [newRole, setNewRole] = useState<VolunteerRole>(VolunteerRole.SECURITY);
+  const [newZone, setNewZone] = useState('North Stand');
+  const [newExperience, setNewExperience] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Team Leader'>('Beginner');
+  const [newStatus, setNewStatus] = useState<VolunteerStatus>(VolunteerStatus.AVAILABLE);
+
   useEffect(() => {
     document.title = 'Volunteer Operations - StadiumOps AI';
     fetchVolunteers(searchQuery, filterRole, filterStatus);
@@ -52,8 +63,71 @@ export default function VolunteersPage(): React.JSX.Element {
   };
 
   const handleRegisterVolunteer = () => {
-    const id = `VOL-${Math.floor(1000 + Math.random() * 9000)}`;
-    pushToast(`New Volunteer Registered: ${id}`, 'Successfully added to active tournament roster database.', 'success');
+    setIsModalOpen(true);
+  };
+
+  const handleSubmitVolunteer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFirstName.trim() || !newLastName.trim()) return;
+
+    // Numerical ordered ID generation
+    let maxNum = 199; // default baseline in mocks
+    volunteers.forEach(v => {
+      const match = v.id.match(/\d+$/);
+      if (match) {
+        const num = parseInt(match[0], 10);
+        if (num > maxNum) {
+          maxNum = num;
+        }
+      }
+    });
+    const id = `VOL-2026-${maxNum + 1}`;
+
+    const newVolunteer: Volunteer = {
+      id,
+      firstName: newFirstName,
+      lastName: newLastName,
+      role: newRole,
+      languages: ['en'],
+      status: newStatus,
+      currentZone: newZone,
+      experienceLevel: newExperience,
+      certifications: ['General Duty Guide'],
+      contact: '+1-555-010-2026',
+      availability: newStatus === VolunteerStatus.AVAILABLE,
+      rating: 4.5,
+    };
+
+    volunteers.unshift(newVolunteer);
+    fetchVolunteers(searchQuery, filterRole, filterStatus);
+    selectVolunteer(newVolunteer);
+
+    // Reset Form
+    setNewFirstName('');
+    setNewLastName('');
+    setNewRole(VolunteerRole.SECURITY);
+    setNewZone('North Stand');
+    setNewExperience('Beginner');
+    setNewStatus(VolunteerStatus.AVAILABLE);
+    setIsModalOpen(false);
+
+    pushToast(
+      `New Volunteer Registered: ${id}`,
+      'Successfully added to active tournament roster database.',
+      'success'
+    );
+  };
+
+  const updateVolunteerStatus = (id: string, nextStatus: VolunteerStatus) => {
+    const target = volunteers.find(v => v.id === id);
+    if (target) {
+      target.status = nextStatus;
+      target.availability = nextStatus === VolunteerStatus.AVAILABLE;
+    }
+    fetchVolunteers(searchQuery, filterRole, filterStatus);
+    if (selected && selected.id === id) {
+      selectVolunteer({ ...selected, status: nextStatus, availability: nextStatus === VolunteerStatus.AVAILABLE });
+    }
   };
 
   const statusColors: Record<VolunteerStatus, 'success' | 'warning' | 'info' | 'neutral' | 'danger'> = {
@@ -143,33 +217,51 @@ export default function VolunteersPage(): React.JSX.Element {
               <p className="text-xs text-text-muted mt-2">Adjust filters or search parameters.</p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-[650px] overflow-y-auto pr-1">
-              {list.data?.map((v: Volunteer) => {
-                const isSelected = selected?.id === v.id;
-                return (
-                  <div
-                    key={v.id}
-                    onClick={() => selectVolunteer(v)}
-                    className={`p-2.5 px-4 bg-[#14171d] border rounded transition-all hover:border-stadium-accent cursor-pointer flex items-center justify-between ${
-                      isSelected ? 'border-stadium-accent ring-1 ring-stadium-accent bg-stadium-accent/5' : 'border-white/[0.04]'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <strong className="text-xs text-text-primary font-bold">{v.firstName} {v.lastName}</strong>
-                        <span className="text-[9px] font-mono text-text-muted">({v.id})</span>
-                        <span className="text-[10px] text-text-muted">| {v.role}</span>
-                      </div>
-                      <p className="text-[10px] text-text-secondary mt-0.5">Zone: <strong className="text-text-primary">{v.currentZone}</strong></p>
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                      <span className="text-[9.5px] text-text-muted font-semibold">Exp: {v.experienceLevel}</span>
-                      <Badge variant={statusColors[v.status]}>{v.status}</Badge>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="bg-[#14171d] border border-white/[0.04] rounded-xl overflow-hidden shadow-subtle">
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-stadium-border bg-[#0a0b0d]/60 text-[10px] font-bold text-text-muted uppercase tracking-wider sticky top-0 z-10">
+                      <th className="py-2.5 px-3">ID</th>
+                      <th className="py-2.5 px-3">Name</th>
+                      <th className="py-2.5 px-3">Zone</th>
+                      <th className="py-2.5 px-3">Exp</th>
+                      <th className="py-2.5 px-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-xs divide-y divide-white/[0.02]">
+                    {list.data
+                      ?.slice()
+                      .sort((a, b) => {
+                        const numA = parseInt(a.id.match(/\d+$/)?.[0] || '0', 10);
+                        const numB = parseInt(b.id.match(/\d+$/)?.[0] || '0', 10);
+                        return numB - numA;
+                      })
+                      .map((v: Volunteer) => {
+                        const isSelected = selected?.id === v.id;
+                        return (
+                          <tr
+                            key={v.id}
+                            onClick={() => selectVolunteer(v)}
+                            className={`cursor-pointer hover:bg-white/[0.02] transition-colors ${
+                              isSelected ? 'bg-stadium-accent/10 border-l-2 border-stadium-accent' : ''
+                            }`}
+                          >
+                            <td className="py-2 px-3 font-mono font-bold text-text-muted">{v.id}</td>
+                            <td className="py-2 px-3 font-bold text-text-primary">
+                              {v.firstName} {v.lastName} <span className="text-[10px] text-text-muted font-normal block">{v.role}</span>
+                            </td>
+                            <td className="py-2 px-3 text-text-secondary">{v.currentZone}</td>
+                            <td className="py-2 px-3 text-text-muted">{v.experienceLevel}</td>
+                            <td className="py-2 px-3">
+                              <Badge variant={statusColors[v.status]}>{v.status}</Badge>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
@@ -187,7 +279,15 @@ export default function VolunteersPage(): React.JSX.Element {
                   </h3>
                   <span className="text-[10px] font-mono text-text-muted block mt-1">{selected.id}</span>
                 </div>
-                <Badge variant={statusColors[selected.status]}>{selected.status}</Badge>
+                <select
+                  value={selected.status}
+                  onChange={(e) => updateVolunteerStatus(selected.id, e.target.value as VolunteerStatus)}
+                  className="bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer font-bold uppercase tracking-wider"
+                >
+                  {Object.values(VolunteerStatus).map((status) => (
+                    <option key={status} value={status}>{status}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-4">
@@ -303,7 +403,10 @@ export default function VolunteersPage(): React.JSX.Element {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => pushToast('Deployment Dispatched', `${selected.firstName} ${selected.lastName} dispatched to North Gate ticket lines.`, 'success')}
+                      onClick={() => {
+                        updateVolunteerStatus(selected.id, VolunteerStatus.ASSIGNED);
+                        pushToast('Deployment Dispatched', `${selected.firstName} ${selected.lastName} dispatched to North Gate ticket lines.`, 'success');
+                      }}
                       className="text-text-primary border-stadium-accent/50 hover:bg-stadium-accent/5"
                     >
                       Dispatch
@@ -311,7 +414,10 @@ export default function VolunteersPage(): React.JSX.Element {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => pushToast('Break Initiated', `${selected.firstName} ${selected.lastName} marked as ON BREAK. Relief volunteer notified.`, 'info')}
+                      onClick={() => {
+                        updateVolunteerStatus(selected.id, VolunteerStatus.BREAK);
+                        pushToast('Break Initiated', `${selected.firstName} ${selected.lastName} marked as ON BREAK. Relief volunteer notified.`, 'info');
+                      }}
                       className="text-text-primary border-stadium-warning/50 hover:bg-stadium-warning/5"
                     >
                       Initiate Break
@@ -328,6 +434,120 @@ export default function VolunteersPage(): React.JSX.Element {
         </div>
 
       </div>
+
+      {/* 2. REGISTER VOLUNTEER OVERLAY MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#14171d] border border-white/[0.08] rounded-xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-stadium-border pb-3">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Register New Volunteer</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-text-muted hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitVolunteer} className="space-y-4 text-xs text-text-secondary">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="block text-text-muted font-bold uppercase tracking-wider">First Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={newFirstName}
+                    onChange={(e) => setNewFirstName(e.target.value)}
+                    placeholder="e.g. Jane"
+                    className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-text-muted font-bold uppercase tracking-wider">Last Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={newLastName}
+                    onChange={(e) => setNewLastName(e.target.value)}
+                    placeholder="e.g. Doe"
+                    className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-text-muted font-bold uppercase tracking-wider">Role</label>
+                <select
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value as VolunteerRole)}
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer"
+                >
+                  {Object.values(VolunteerRole).map((role) => (
+                    <option key={role} value={role}>{role}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-text-muted font-bold uppercase tracking-wider">Current Zone</label>
+                <select
+                  value={newZone}
+                  onChange={(e) => setNewZone(e.target.value)}
+                  className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer"
+                >
+                  {['North Stand', 'South Stand', 'East Stand', 'West Stand', 'VIP Area', 'Parking Zone A', 'Fan Zone B', 'Media Center'].map((zone) => (
+                    <option key={zone} value={zone}>{zone}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="block text-text-muted font-bold uppercase tracking-wider">Experience Level</label>
+                  <select
+                    value={newExperience}
+                    onChange={(e) => setNewExperience(e.target.value as 'Beginner' | 'Intermediate' | 'Advanced' | 'Team Leader')}
+                    className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer"
+                  >
+                    {['Beginner', 'Intermediate', 'Advanced', 'Team Leader'].map((exp) => (
+                      <option key={exp} value={exp}>{exp}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-text-muted font-bold uppercase tracking-wider">Status</label>
+                  <select
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(e.target.value as VolunteerStatus)}
+                    className="w-full bg-[#0a0b0d] text-text-primary border border-stadium-border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stadium-accent cursor-pointer"
+                  >
+                    {Object.values(VolunteerStatus).map((status) => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsModalOpen(false)}
+                  className="font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  className="bg-stadium-accent hover:bg-blue-700 text-white font-bold uppercase tracking-wider"
+                >
+                  Register Volunteer
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

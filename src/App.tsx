@@ -20,6 +20,7 @@ const CommunicationsPage = lazy(() => import('./features/communications/Communic
 const AccessibilityPage = lazy(() => import('./features/accessibility/AccessibilityPage'));
 const ReportsPage = lazy(() => import('./features/reports/ReportsPage'));
 const SettingsPage = lazy(() => import('./features/settings/SettingsPage'));
+const ProfilePage = lazy(() => import('./features/profile/ProfilePage'));
 const NotFoundPage = lazy(() => import('./features/notfound/NotFoundPage'));
 
 /**
@@ -69,6 +70,7 @@ export default function App(): React.JSX.Element {
                 <Route path={ROUTES.ACCESSIBILITY} element={<PageTransition><AccessibilityPage /></PageTransition>} />
                 <Route path="/reports" element={<PageTransition><ReportsPage /></PageTransition>} />
                 <Route path={ROUTES.SETTINGS} element={<PageTransition><SettingsPage /></PageTransition>} />
+                <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
                 <Route path="*" element={<PageTransition><NotFoundPage /></PageTransition>} />
               </Routes>
             </Suspense>
